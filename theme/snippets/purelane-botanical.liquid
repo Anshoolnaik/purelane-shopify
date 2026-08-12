@@ -1,0 +1,80 @@
+{%- comment -%}
+  PURELANE — BOTANICAL ART
+  ---------------------------------------------------------------------------
+  The five ingredient line drawings.
+
+  Recoloured at the source rather than overridden. The prototype authored these
+  in the V1 dark palette (stroke #ece6f7, accent #f0a03c) and then repainted
+  them in V2 with attribute selectors:
+
+      .ing-i .art svg [stroke="#f0a03c"] { stroke: #b8701c }
+      .ing-i .art svg [fill="#ece6f7"]   { fill: #0d5b52 }
+
+  Matching on a hex value in an attribute is brittle — it breaks the moment
+  anyone edits a path — so the drawings simply carry the colours they render
+  in. The main stroke inherits currentColor and the accent strokes take a
+  class, which is also what makes them themeable.
+
+  Accepts:
+    name  string  one of: coconut, orange-peel, soap-nut, neem, lemongrass
+{%- endcomment -%}
+
+<svg
+  class="pl-botanical"
+  viewBox="0 0 100 100"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+>
+  {%- case name -%}
+
+    {%- when 'coconut' -%}
+      <circle cx="50" cy="62" r="25"/>
+      <path d="M31 53c9-6 29-6 38 0" class="pl-botanical__accent"/>
+      <path d="M41 63c4 8 14 8 18 0" opacity=".55"/>
+      <path d="M50 37V25"/>
+      <path d="M50 27C42 18 30 16 21 21c5 10 17 13 29 6Z" class="pl-botanical__accent"/>
+      <path d="M50 27c8-9 20-11 29-6-5 10-17 13-29 6Z" class="pl-botanical__accent"/>
+
+    {%- when 'orange-peel' -%}
+      <circle cx="45" cy="58" r="23"/>
+      <path d="M45 35v46M22 58h46" opacity=".4"/>
+      <path d="M29 42 61 74M61 42 29 74" opacity=".26"/>
+      <path d="M62 28c13-1 20 10 15 20-4 8-15 9-19 2" class="pl-botanical__accent"/>
+      <path d="M45 34c-3-8 2-15 10-16 1 9-3 15-10 16Z" class="pl-botanical__accent"/>
+
+    {%- when 'soap-nut' -%}
+      <circle cx="36" cy="66" r="16"/>
+      <circle cx="64" cy="69" r="14"/>
+      <circle cx="50" cy="43" r="14"/>
+      <path d="M50 29V17"/>
+      <path d="M50 21c-8-8-18-8-23-2 7 8 17 10 23 2Z" class="pl-botanical__accent"/>
+      <path d="M31 60a5 5 0 0 1 4-4" opacity=".6"/>
+      <path d="M46 38a5 5 0 0 1 4-4" opacity=".6"/>
+
+    {%- when 'neem' -%}
+      <path d="M18 82C36 66 58 44 82 20" class="pl-botanical__accent"/>
+      <path d="M27 73c-6-7-4-15 3-18 4 7 3 14-3 18Z"/>
+      <path d="M31 69c8-4 15 0 16 8-8 2-14-1-16-8Z"/>
+      <path d="M41 59c-6-7-4-16 3-19 4 7 3 15-3 19Z"/>
+      <path d="M45 55c9-4 16 0 17 8-8 2-15-1-17-8Z"/>
+      <path d="M56 44c-6-7-4-16 3-19 4 7 3 15-3 19Z"/>
+      <path d="M60 40c9-4 16 0 17 8-8 2-15-1-17-8Z"/>
+      <path d="M70 30c-5-7-3-15 4-18 3 7 2 14-4 18Z"/>
+
+    {%- when 'lemongrass' -%}
+      <g fill="currentColor" opacity=".88">
+      <path d="M50 88C44 62 39 42 24 15c15 27 22 47 29 73Z"/>
+      <path d="M52 88C50 60 50 39 44 9c11 29 13 50 12 79Z"/>
+      <path d="M54 88C56 60 60 40 74 13c-11 28-15 48-16 75Z"/>
+      <path d="M56 88C60 64 68 48 86 27c-14 22-21 38-26 61Z"/>
+      <path d="M48 88C44 66 36 50 18 30c14 21 22 36 27 58Z"/>
+      </g>
+      <path d="M50 88h6" class="pl-botanical__accent" stroke-width="2.4" stroke-linecap="round"/>
+
+  {%- endcase -%}
+</svg>
