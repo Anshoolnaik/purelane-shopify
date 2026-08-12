@@ -340,10 +340,22 @@ Deliberately not done, and why:
 - **No bundle picker logic.** See 6.2.
 - **No automated tests.** See 6.6.
 
-Verified by reading and by static checks: every section schema parses as JSON,
-every script passes `node --check`, the template parses, and all fourteen
-silhouettes and five botanical drawings were extracted programmatically rather
-than retyped, so no path data was transcribed by hand.
+Verified:
+
+- **`shopify theme check` — 28 files inspected, no offenses.** Shopify's own
+  linter, run against the whole theme.
+- Every section schema parses as JSON; every script passes `node --check`.
+- Every `asset_url`, `render` target and section type resolves; every
+  `section.settings.*` and `block.settings.*` reference matches a declared
+  schema id; `index.json` references only declared sections, blocks and
+  settings.
+- All fourteen silhouettes and five botanical drawings were extracted
+  programmatically rather than retyped, so no path data was transcribed by hand.
+
+Theme Check earned its keep: it caught the rating snippet assigning to `empty`,
+which is a **Liquid keyword literal** used in comparisons like `value == empty`.
+Assigning to it shadows the language's own token. That reads as a style warning
+and is not one.
 
 **Not verified in a browser.** I did not have a development store to render
 against, so nothing here has been visually diffed against the prototype or run

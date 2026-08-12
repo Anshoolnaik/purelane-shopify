@@ -96,7 +96,17 @@ stale timer, a detached node or an invisible section behind.
 
 ## Verification
 
-Static checks that run over the whole theme:
+Shopify's own linter, over the whole theme:
+
+```bash
+cd theme && shopify theme check
+# 28 files inspected with no offenses found.
+```
+
+> Shopify CLI needs Node 22.8+. On older Node, pin the CLI:
+> `npm i -g @shopify/cli@3.70.0`
+
+Plus static checks:
 
 ```bash
 # every section schema parses as JSON
