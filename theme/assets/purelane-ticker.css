@@ -1,0 +1,56 @@
+/* ==========================================================================
+   PURELANE — TICKER
+   The scrolling announcement strip above the header.
+   ========================================================================== */
+
+.pl-ticker {
+  position: relative;
+  z-index: 40;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.74);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--pl-line);
+  color: var(--pl-paper-2);
+}
+
+.pl-ticker__track {
+  display: inline-flex;
+  gap: 40px;
+  padding: 9px 20px;
+  animation: pl-ticker-scroll var(--pl-ticker-duration, 30s) linear infinite;
+}
+
+.pl-ticker:hover .pl-ticker__track,
+.pl-ticker:focus-within .pl-ticker__track {
+  animation-play-state: paused;
+}
+
+.pl-ticker b {
+  color: var(--pl-leaf);
+  font-weight: 700;
+}
+
+@keyframes pl-ticker-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* The prototype marked the whole strip aria-hidden and left it animating for
+   everyone. Under reduced motion the animation stops, which would strand any
+   message past the first — so it becomes a scroll region instead. */
+@media (prefers-reduced-motion: reduce) {
+  .pl-ticker {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .pl-ticker__track { animation: none; }
+
+  .pl-ticker__track [data-pl-ticker-clone] { display: none; }
+}
