@@ -349,6 +349,15 @@
 
 .pl-panel-head .pl-d2 { margin-bottom: 12px; }
 
+/* The prototype re-declared these two offsets inline on every use
+   (style="margin-top:12px", style="margin:14px auto 0"). The gap above the
+   heading only appeared when a kicker preceded it — "Sourced from nature" has
+   no kicker and no offset — so that relationship is expressed as a sibling
+   selector rather than baked in unconditionally. */
+.pl-panel-head .pl-kicker + .pl-panel-head__title { margin-top: 12px; }
+
+.pl-panel-head__lede { margin: 14px auto 0; }
+
 .pl-rule {
   display: flex;
   align-items: center;
