@@ -133,18 +133,20 @@
         <div class="pl-hero__stage" data-pl-hero-track>
           {%- for block in slides -%}
             {%- liquid
-              assign shots = ''
+              comment
+                How many products are on this slide. The composition class
+                (--x1 / --x2 / --x3) drives the overlap geometry.
+              endcomment
+              assign shot_count = 0
               if block.settings.product_1 != blank
-                assign shots = shots | append: 'a,'
+                assign shot_count = shot_count | plus: 1
               endif
               if block.settings.product_2 != blank
-                assign shots = shots | append: 'b,'
+                assign shot_count = shot_count | plus: 1
               endif
               if block.settings.product_3 != blank
-                assign shots = shots | append: 'c,'
+                assign shot_count = shot_count | plus: 1
               endif
-              assign shot_keys = shots | split: ','
-              assign shot_count = shot_keys.size
 
               comment
                 Price source: an explicit bundle product if the merchant set
@@ -161,25 +163,43 @@
               {% unless forloop.first %}aria-hidden="true"{% endunless %}
               {{ block.shopify_attributes }}
             >
-              {%- for key in shot_keys -%}
-                {%- liquid
-                  case key
-                    when 'a'
-                      assign shot_product = block.settings.product_1
-                    when 'b'
-                      assign shot_product = block.settings.product_2
-                    else
-                      assign shot_product = block.settings.product_3
-                  endcase
-                -%}
+              {%- comment -%}
+                The three slots are rendered explicitly rather than looped.
+                Each slot's position class and stagger delay are fixed —
+                slot A is always the first to arrive, C always last — so a
+                loop would only add indirection, and building the slot list
+                as a string was the kind of construct that reads as unused to
+                static analysis.
+              {%- endcomment -%}
+              {%- if block.settings.product_1 != blank -%}
                 {% render 'purelane-product-media',
-                  product: shot_product,
-                  class: 'pl-hero__shot pl-hero__shot--' | append: key | append: ' pl-hero__shot--s' | append: forloop.index,
+                  product: block.settings.product_1,
+                  class: 'pl-hero__shot pl-hero__shot--a pl-hero__shot--s1',
                   sizes: '(min-width: 901px) min(50vw, 560px), 88vw',
                   loading: 'eager',
                   fetchpriority: 'high'
                 %}
-              {%- endfor -%}
+              {%- endif -%}
+
+              {%- if block.settings.product_2 != blank -%}
+                {% render 'purelane-product-media',
+                  product: block.settings.product_2,
+                  class: 'pl-hero__shot pl-hero__shot--b pl-hero__shot--s2',
+                  sizes: '(min-width: 901px) min(50vw, 560px), 88vw',
+                  loading: 'eager',
+                  fetchpriority: 'high'
+                %}
+              {%- endif -%}
+
+              {%- if block.settings.product_3 != blank -%}
+                {% render 'purelane-product-media',
+                  product: block.settings.product_3,
+                  class: 'pl-hero__shot pl-hero__shot--c pl-hero__shot--s3',
+                  sizes: '(min-width: 901px) min(50vw, 560px), 88vw',
+                  loading: 'eager',
+                  fetchpriority: 'high'
+                %}
+              {%- endif -%}
 
               {%- if price_product != blank -%}
                 <div class="pl-hero__tag pl-glass-2">

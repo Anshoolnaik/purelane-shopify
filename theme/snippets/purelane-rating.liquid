@@ -55,7 +55,11 @@
     if filled > scale_max
       assign filled = scale_max
     endif
-    assign empty = scale_max | minus: filled
+    comment
+      Not named `empty`: that is a Liquid keyword literal, used in comparisons
+      like `value == empty`. Assigning to it shadows the language's own token.
+    endcomment
+    assign hollow = scale_max | minus: filled
   -%}
 
   {%- if display == 'stars' -%}
@@ -63,8 +67,8 @@
     <div class="pl-stars {{ class }}">
       <span aria-hidden="true">
         {%- for i in (1..filled) -%}★{%- endfor -%}
-        {%- if empty > 0 -%}
-          {%- for i in (1..empty) -%}☆{%- endfor -%}
+        {%- if hollow > 0 -%}
+          {%- for i in (1..hollow) -%}☆{%- endfor -%}
         {%- endif -%}
       </span>
       <span class="pl-visually-hidden">
