@@ -151,7 +151,48 @@ cd ../dawn
 shopify theme push --store your-store.myshopify.com --unpublished --theme "Purelane"
 ```
 
-### Without the CLI
+### If the CLI refuses: upload a ZIP instead
+
+The CLI will not touch a development store unless you are the store owner **and**
+have signed into the store admin directly at least once:
+
+```
+You are not authorized to edit themes on "<store>.myshopify.com".
+```
+
+Signing in through the Partners dashboard "Login" button does not count. Open
+`https://<store>.myshopify.com/admin` in a browser, sign in, then
+`shopify auth logout` and retry.
+
+If that still fails, skip the CLI. This path always works:
+
+```bash
+# 1. get Dawn (no auth needed)
+curl -L -o dawn.zip https://github.com/Shopify/dawn/archive/refs/tags/v16.0.0.zip
+# unzip it and rename the folder to ../dawn
+
+# 2. merge the Purelane sections in
+node scripts/install-into-dawn.mjs ../dawn
+
+# 3. package it
+python scripts/build-theme-zip.py ../dawn purelane-theme.zip
+```
+
+Then in the admin: **Online Store → Themes → Add theme → Upload zip file**,
+pick `purelane-theme.zip`, and hit **Publish** or **Preview**.
+
+The packaging script is Python rather than Node for one specific reason: on
+Windows PowerShell, both `Compress-Archive` and .NET's `ZipFile` write ZIP entry
+names with **backslash** separators. The ZIP spec mandates forward slashes and
+Shopify rejects the archive, with an error that does not say why. Python's
+`zipfile` writes correct paths, and the script verifies separators and archive
+integrity before telling you it is safe to upload.
+
+The trade: no hot reload. Every change means re-running steps 2–3 and
+re-uploading. Fine for a review, painful for iteration — worth fixing the CLI
+auth if you plan to keep working on it.
+
+### Editing in the admin instead
 
 Copy the contents of `theme/assets`, `theme/sections`, `theme/snippets` and
 `theme/templates` into Dawn through **Online Store → Themes → Edit code**, then
