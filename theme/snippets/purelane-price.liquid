@@ -16,8 +16,9 @@
   Accepts:
     product   object   required
     variant   object   optional. Prices this variant instead of the product
-    saving    string   optional. 'percent' (default) or 'amount'
-    class     string   optional. Extra classes on the wrapper
+    saving     string  optional. 'percent' (default) or 'amount'
+    class      string  optional. Extra classes on the wrapper
+    from_label string  optional. Prefix when the price varies. Defaults to 'From'
 
   Usage:
     {% render 'purelane-price', product: card_product %}
@@ -46,15 +47,19 @@
 -%}
 
 <div class="pl-price {{ class }}">
+  {%- comment -%}
+    The money value is formatted first and only then placed into the sentence.
+    Chaining `| money` after an `append` or a `t:` applies it to the resulting
+    string rather than the number, which renders as nothing at all — no error,
+    just an empty price.
+  {%- endcomment -%}
+  {%- assign price_money = price | money -%}
+
   <strong class="pl-price__now">
     {%- if varies -%}
-      {{- 'products.product.from_price_html' | t: price: price | money -}}
-      {%- comment -%}
-        Dawn ships this translation key; if a theme lacks it the filter falls
-        back to the raw price, which still reads correctly.
-      {%- endcomment -%}
+      {{ from_label | default: 'From' }} {{ price_money }}
     {%- else -%}
-      {{- price | money -}}
+      {{- price_money -}}
     {%- endif -%}
   </strong>
 
