@@ -1,0 +1,118 @@
+{%- comment -%}
+  PURELANE — PRODUCT CARD
+  ---------------------------------------------------------------------------
+  The card from the "Loved by 30,000 homes" shelf, rebuilt against real
+  products. Extracted as a snippet because the shelf is not the only place a
+  product card belongs — the same component serves any future collection or
+  recommendation section without a second implementation.
+
+  Production issues fixed here that the prototype could not have had:
+
+  - The prototype's cards linked nowhere. A storefront product card that does
+    not reach the product page is broken commerce, so the title and image now
+    link to product.url. The image link is removed from the tab order and
+    hidden from assistive tech so it is not a duplicate stop announcing the
+    same destination twice.
+
+  - "Add to cart" was a dead <button>. It is now a real product form, so it
+    works with JavaScript disabled and goes through Dawn's own cart. Products
+    with more than one variant link to the product page instead, because a
+    card cannot express a variant choice.
+
+  - Sold-out products get a disabled control and a badge. The prototype had no
+    inventory to be out of.
+
+  - Long titles are clamped to three lines so one long product name cannot
+    push its card taller than the rest of the row. All three states are in the
+    seeded catalogue on purpose.
+
+  Accepts:
+    product      object   required
+    reveal_delay string   optional, e.g. 'pl-rv--d1'
+    sizes        string   optional, passed to the media snippet
+    loading      string   optional, 'lazy' (default) or 'eager'
+    heading_level string  optional, defaults to 'h3'
+
+  Usage:
+    {% render 'purelane-product-card', product: card_product, reveal_delay: 'pl-rv--d1' %}
+{%- endcomment -%}
+
+{%- liquid
+  assign delay = reveal_delay | default: ''
+  assign card_sizes = sizes | default: '(min-width: 860px) 260px, 44vw'
+  assign img_loading = loading | default: 'lazy'
+  assign level = heading_level | default: 'h3'
+
+  assign badge = product.metafields.purelane.badge.value
+  assign available = product.available
+  assign single_variant = false
+  if product.variants.size == 1
+    assign single_variant = true
+  endif
+-%}
+
+<article class="pl-glass pl-card pl-rv {{ delay }}">
+
+  <a
+    class="pl-card__shot"
+    href="{{ product.url }}"
+    tabindex="-1"
+    aria-hidden="true"
+  >
+    {%- if badge != blank -%}
+      <span class="pl-card__badge">{{ badge }}</span>
+    {%- elsif available == false -%}
+      <span class="pl-card__badge pl-card__badge--out">Sold out</span>
+    {%- endif -%}
+
+    {% render 'purelane-product-media',
+      product: product,
+      class: 'pl-card__img',
+      sizes: card_sizes,
+      loading: img_loading
+    %}
+  </a>
+
+  {%- case level -%}
+    {%- when 'h2' -%}
+      <h2 class="pl-card__title"><a href="{{ product.url }}">{{ product.title }}</a></h2>
+    {%- when 'h4' -%}
+      <h4 class="pl-card__title"><a href="{{ product.url }}">{{ product.title }}</a></h4>
+    {%- else -%}
+      <h3 class="pl-card__title"><a href="{{ product.url }}">{{ product.title }}</a></h3>
+  {%- endcase -%}
+
+  {% render 'purelane-rating', product: product, class: 'pl-card__rate' %}
+
+  {% render 'purelane-price', product: product, class: 'pl-card__price' %}
+
+  {%- if available == false -%}
+
+    <button type="button" class="pl-btn pl-btn--ghost pl-btn--sm pl-btn--block" disabled>
+      Sold out
+    </button>
+
+  {%- elsif single_variant -%}
+
+    {%- form 'product', product, class: 'pl-card__form' -%}
+      <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+      <button type="submit" name="add" class="pl-btn pl-btn--ghost pl-btn--sm pl-btn--block">
+        Add to cart
+        <span class="pl-visually-hidden">, {{ product.title }}</span>
+      </button>
+    {%- endform -%}
+
+  {%- else -%}
+
+    {%- comment -%}
+      More than one variant: a card cannot express the choice, so send the
+      shopper to the product page rather than silently adding a default.
+    {%- endcomment -%}
+    <a href="{{ product.url }}" class="pl-btn pl-btn--ghost pl-btn--sm pl-btn--block">
+      Choose options
+      <span class="pl-visually-hidden">for {{ product.title }}</span>
+    </a>
+
+  {%- endif -%}
+
+</article>
