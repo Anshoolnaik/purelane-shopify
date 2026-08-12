@@ -1,0 +1,156 @@
+/* ==========================================================================
+   PURELANE — REVIEWS RAIL
+   An auto-scrolling marquee of review cards.
+   ========================================================================== */
+
+.pl-reviews { padding: var(--pl-sec-y) 0; }
+
+/* --- Header -------------------------------------------------------------- */
+.pl-reviews__head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px 18px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.pl-reviews__agg {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pl-paper-2);
+}
+
+.pl-reviews__agg b {
+  font-family: var(--pl-font-display);
+  font-size: 16px;
+  color: var(--pl-accent);
+  letter-spacing: 0;
+}
+
+.pl-reviews__head .pl-stars { font-size: 12px; }
+
+/* --- Rail ---------------------------------------------------------------- */
+.pl-reviews__rail {
+  overflow: hidden;
+  position: relative;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+
+.pl-reviews__track {
+  display: flex;
+  gap: 12px;
+  width: max-content;
+  animation: pl-marquee var(--pl-marquee-duration, 52s) linear infinite;
+}
+
+/* Pausing on focus-within as well as hover, so a keyboard user reading a card
+   is not carried away mid-sentence. */
+.pl-reviews__rail:hover .pl-reviews__track,
+.pl-reviews__rail:focus-within .pl-reviews__track {
+  animation-play-state: paused;
+}
+
+@keyframes pl-marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+/* --- Card ---------------------------------------------------------------- */
+.pl-review {
+  flex: 0 0 auto;
+  width: 284px;
+  padding: 15px 17px;
+  border-radius: 18px;
+}
+
+.pl-review .pl-stars {
+  font-size: 10.5px;
+  margin-bottom: 9px;
+}
+
+.pl-review__title {
+  font-family: var(--pl-font-display);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--pl-surface);
+  margin-bottom: 7px;
+}
+
+.pl-review__body {
+  font-size: 12.6px;
+  color: var(--pl-paper-2);
+  line-height: 1.52;
+  margin-bottom: 11px;
+}
+
+.pl-review__who {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pl-paper-3);
+}
+
+.pl-review__who b {
+  color: var(--pl-teal-ink);
+  font-weight: 700;
+}
+
+.pl-review__who svg {
+  width: 12px;
+  height: 12px;
+  color: var(--pl-leaf);
+  flex: 0 0 auto;
+}
+
+/* --- Mobile -------------------------------------------------------------- */
+@media (max-width: 760px) {
+  .pl-review {
+    width: 250px;
+    padding: 13px 14px;
+  }
+
+  .pl-reviews__track { --pl-marquee-duration: 40s; }
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion
+   The prototype only stopped the animation, which left the rail as a clipped
+   `overflow: hidden` strip — every card past the fold became unreachable. Here
+   it degrades into a real horizontal scroll region instead, and the duplicate
+   card set is collapsed so the same reviews are not repeated to a reader who
+   can now scroll through all of them.
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .pl-reviews__rail {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+  }
+
+  .pl-reviews__rail:focus-visible {
+    outline: 2px solid var(--pl-leaf);
+    outline-offset: -2px;
+  }
+
+  .pl-reviews__track {
+    animation: none;
+    width: auto;
+  }
+
+  .pl-review { scroll-snap-align: start; }
+
+  .pl-reviews__track [data-pl-marquee-clone] { display: none; }
+}
