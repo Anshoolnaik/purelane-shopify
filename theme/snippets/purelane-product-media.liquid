@@ -1,0 +1,119 @@
+{%- comment -%}
+  PURELANE — PRODUCT MEDIA
+  ---------------------------------------------------------------------------
+  Renders a product shot. This is the single biggest translation in the build:
+  the prototype had no <img> tags at all, so every product visual was a fixed
+  CSS silhouette. Here they become real, responsive Shopify product images.
+
+  Sizing matches the prototype's model exactly. `.pimg` was height-driven —
+  each context set a height and the width followed from the aspect ratio — so
+  the <img> is sized the same way: height from the section's CSS, `width: auto`,
+  `object-fit: contain`, `object-position: center bottom`. Swapping a tall
+  bottle for a wide carton therefore reflows exactly as the prototype did.
+
+  If the product has no image the prototype's own silhouette is drawn instead,
+  keeping the layout intact. That path is exercised by the seeded no-image
+  product. Silhouette choice resolves in this order:
+    1. an explicit `silhouette` argument
+    2. the product's `purelane.silhouette` metafield
+    3. a keyword match against the product handle
+    4. 'kitchen'
+
+  Accepts:
+    product        object   required unless `image` is given
+    image          object   optional. Overrides product.featured_image
+    silhouette     string   optional. Forces a fallback silhouette key
+    class          string   optional. Extra classes on the rendered node
+    sizes          string   optional. Defaults to a conservative 45vw
+    widths         string   optional. Defaults to the shared ladder
+    loading        string   optional. 'lazy' (default) or 'eager'
+    fetchpriority  string   optional. 'auto' (default), 'high' or 'low'
+    alt            string   optional. Overrides the derived alt text
+
+  Usage:
+    {% render 'purelane-product-media', product: card_product,
+       class: 'pl-card__img', sizes: '(min-width: 860px) 240px, 42vw' %}
+{%- endcomment -%}
+
+{%- liquid
+  assign media_image = image | default: product.featured_image
+  assign extra_class = class | default: ''
+  assign img_sizes = sizes | default: '45vw'
+  assign img_widths = widths | default: '120,180,240,320,420,560,760,960'
+  assign img_loading = loading | default: 'lazy'
+  assign img_priority = fetchpriority | default: 'auto'
+
+  comment
+    Alt text. A product image's own alt wins because a merchant may have
+    written something specific; the product title is the sensible fallback.
+    Never leave it empty: these images carry the product identity.
+  endcomment
+  if alt != blank
+    assign alt_text = alt
+  elsif media_image.alt != blank
+    assign alt_text = media_image.alt
+  else
+    assign alt_text = product.title
+  endif
+-%}
+
+{%- if media_image != blank -%}
+
+  {{
+    media_image
+    | image_url: width: 960
+    | image_tag:
+      loading: img_loading,
+      fetchpriority: img_priority,
+      widths: img_widths,
+      sizes: img_sizes,
+      alt: alt_text,
+      class: 'pl-pimg ' | append: extra_class
+  }}
+
+{%- else -%}
+
+  {%- liquid
+    if silhouette != blank
+      assign sil = silhouette
+    elsif product.metafields.purelane.silhouette.value != blank
+      assign sil = product.metafields.purelane.silhouette.value
+    else
+      assign handle = product.handle | downcase
+      if handle contains 'kitchen'
+        assign sil = 'kitchen'
+      elsif handle contains 'tap' or handle contains 'limescale'
+        assign sil = 'tap'
+      elsif handle contains 'floor'
+        assign sil = 'floor'
+      elsif handle contains 'toilet'
+        assign sil = 'toilet'
+      elsif handle contains 'laundry' or handle contains 'detergent'
+        assign sil = 'laundry'
+      elsif handle contains 'dish'
+        assign sil = 'dish'
+      elsif handle contains 'copper' or handle contains 'brass' or handle contains 'metal'
+        assign sil = 'metal'
+      elsif handle contains 'machine' or handle contains 'descaler'
+        assign sil = 'wm'
+      elsif handle contains 'handwash' or handle contains 'hand-wash'
+        assign sil = 'handwash'
+      elsif handle contains 'eraser'
+        assign sil = 'eraser'
+      else
+        assign sil = 'kitchen'
+      endif
+    endif
+  -%}
+
+  {%- comment -%}
+    role="img" + aria-label, because a background-image carries no accessible
+    name of its own. This mirrors how the prototype marked up its spans.
+  {%- endcomment -%}
+  <span
+    class="pl-sil pl-sil--{{ sil }} pl-pimg {{ extra_class }}"
+    role="img"
+    aria-label="{{ alt_text | escape }}"
+  ></span>
+
+{%- endif -%}
