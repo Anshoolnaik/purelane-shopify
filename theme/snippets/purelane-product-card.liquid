@@ -32,6 +32,12 @@
     sizes        string   optional, passed to the media snippet
     loading      string   optional, 'lazy' (default) or 'eager'
     heading_level string  optional, defaults to 'h3'
+    block_attributes string optional. Pass block.shopify_attributes when the
+                     card is rendered from a block, so the theme editor can
+                     highlight it. Applied to the card itself rather than a
+                     wrapper, which would otherwise need `display: contents`
+                     and drop the card out of the accessibility tree in some
+                     browsers.
 
   Usage:
     {% render 'purelane-product-card', product: card_product, reveal_delay: 'pl-rv--d1' %}
@@ -51,7 +57,7 @@
   endif
 -%}
 
-<article class="pl-glass pl-card pl-rv {{ delay }}">
+<article class="pl-glass pl-card pl-rv {{ delay }}" {{ block_attributes }}>
 
   <a
     class="pl-card__shot"

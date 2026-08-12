@@ -1,0 +1,26 @@
+/* ==========================================================================
+   PURELANE — SHOP GRID
+   The "Loved by 30,000 homes" shelf. Two columns on mobile, four from 860px,
+   exactly as the prototype. Column count is a setting so the same section can
+   serve a three-up layout elsewhere without a second stylesheet.
+   ========================================================================== */
+
+.pl-shelf {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (min-width: 860px) {
+  .pl-shelf { grid-template-columns: repeat(var(--pl-shelf-columns, 4), 1fr); }
+}
+
+/* Empty state. Only ever visible in the theme editor — a merchant who adds
+   the section before choosing a collection sees guidance, not a blank strip. */
+.pl-shelf__empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--pl-paper-3);
+  font-size: 13.5px;
+}
