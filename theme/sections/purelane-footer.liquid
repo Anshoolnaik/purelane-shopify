@@ -1,0 +1,246 @@
+{%- comment -%}
+  PURELANE — FOOTER
+
+  Link columns are Shopify menus rather than hardcoded lists, so they follow
+  Navigation and cannot drift from the rest of the storefront.
+
+  Fixes a contrast bug: the prototype set the company line inline as
+  `color: rgba(236,230,247,.5)`. That is a V1 dark-theme colour, and because
+  it was an inline style the V2 light block could not override it — pale
+  lavender at 50% opacity on a near-white footer. See BUILD-NOTES.md.
+{%- endcomment -%}
+
+{{ 'purelane-tokens.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-base.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-chrome.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-footer.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign menu_blocks = section.blocks | where: 'type', 'menu'
+  assign text_blocks = section.blocks | where: 'type', 'text'
+  assign column_count = menu_blocks.size | plus: text_blocks.size
+  if column_count < 1
+    assign column_count = 1
+  endif
+-%}
+
+<footer class="pl pl-footer" data-pl-scene="{{ section.settings.scene }}">
+  <div class="pl-wrap">
+    <div class="pl-footer__grid" style="--pl-footer-columns: {{ column_count }};">
+
+      <div class="pl-footer__col">
+        <a class="pl-brand" href="{{ routes.root_url }}">
+          <span class="pl-brand__mark">
+            {%- if section.settings.logo != blank -%}
+              {{
+                section.settings.logo
+                | image_url: width: 120
+                | image_tag: loading: 'lazy', widths: '40,80,120', sizes: '40px', alt: shop.name
+              }}
+            {%- else -%}
+              {% render 'purelane-icon', name: 'leaf-stem' %}
+            {%- endif -%}
+          </span>
+          <span class="pl-brand__text">
+            <span class="pl-brand__name">{{ section.settings.brand_name | default: shop.name }}</span>
+            {%- if section.settings.tagline != blank -%}
+              <span class="pl-brand__tagline">{{ section.settings.tagline }}</span>
+            {%- endif -%}
+          </span>
+        </a>
+
+        {%- if section.settings.blurb != blank -%}
+          <div class="pl-footer__blurb">{{ section.settings.blurb }}</div>
+        {%- endif -%}
+      </div>
+
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+
+          {%- when 'menu' -%}
+            {%- if block.settings.menu != blank -%}
+              <div class="pl-footer__col" {{ block.shopify_attributes }}>
+                {%- if block.settings.title != blank -%}
+                  <h2 class="pl-footer__title">{{ block.settings.title }}</h2>
+                {%- endif -%}
+                {%- comment -%}
+                  A nav landmark per column, each named by its own heading, so
+                  the footer is not one undifferentiated list of links.
+                {%- endcomment -%}
+                <nav aria-label="{{ block.settings.title | escape }}">
+                  {%- for link in block.settings.menu.links -%}
+                    <a href="{{ link.url }}">{{ link.title }}</a>
+                  {%- endfor -%}
+                </nav>
+              </div>
+            {%- endif -%}
+
+          {%- when 'text' -%}
+            <div class="pl-footer__col" {{ block.shopify_attributes }}>
+              {%- if block.settings.title != blank -%}
+                <h2 class="pl-footer__title">{{ block.settings.title }}</h2>
+              {%- endif -%}
+
+              {%- if block.settings.email != blank -%}
+                <a href="mailto:{{ block.settings.email }}">{{ block.settings.email }}</a>
+              {%- endif -%}
+
+              {%- if block.settings.phone != blank -%}
+                <a href="tel:{{ block.settings.phone | remove: ' ' }}">{{ block.settings.phone }}</a>
+              {%- endif -%}
+
+              {%- if block.settings.legal != blank -%}
+                <p class="pl-footer__legal">{{ block.settings.legal }}</p>
+              {%- endif -%}
+            </div>
+
+        {%- endcase -%}
+      {%- endfor -%}
+
+    </div>
+
+    <div class="pl-footer__bottom">
+      {%- if section.settings.copyright != blank -%}
+        <span>{{ section.settings.copyright }}</span>
+      {%- else -%}
+        <span>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}</span>
+      {%- endif -%}
+
+      {%- if section.settings.policy_menu != blank -%}
+        <nav aria-label="{{ section.settings.policy_label | default: 'Policies' | escape }}">
+          {%- for link in section.settings.policy_menu.links -%}
+            <a href="{{ link.url }}">{{ link.title }}</a>
+            {%- unless forloop.last %} · {% endunless -%}
+          {%- endfor -%}
+        </nav>
+      {%- endif -%}
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Purelane footer",
+  "tag": "div",
+  "class": "purelane-footer-host",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo"
+    },
+    {
+      "type": "text",
+      "id": "brand_name",
+      "label": "Brand name",
+      "default": "Purelane"
+    },
+    {
+      "type": "text",
+      "id": "tagline",
+      "label": "Tagline",
+      "default": "Clean, simply"
+    },
+    {
+      "type": "richtext",
+      "id": "blurb",
+      "label": "Blurb",
+      "default": "<p>Effective cleaning, powered by nature. Made for Indian homes since day one.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Bottom bar"
+    },
+    {
+      "type": "text",
+      "id": "copyright",
+      "label": "Copyright line",
+      "info": "Leave empty to use the current year and store name."
+    },
+    {
+      "type": "link_list",
+      "id": "policy_menu",
+      "label": "Policy menu"
+    },
+    {
+      "type": "text",
+      "id": "policy_label",
+      "label": "Policy menu accessible label",
+      "default": "Policies"
+    },
+    {
+      "type": "range",
+      "id": "scene",
+      "label": "Backdrop depth",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 4
+    }
+  ],
+  "blocks": [
+    {
+      "type": "menu",
+      "name": "Menu column",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Shop"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Contact column",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Get in touch"
+        },
+        {
+          "type": "text",
+          "id": "email",
+          "label": "Email"
+        },
+        {
+          "type": "text",
+          "id": "phone",
+          "label": "Phone"
+        },
+        {
+          "type": "text",
+          "id": "legal",
+          "label": "Legal entity line"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Purelane footer",
+      "blocks": [
+        { "type": "menu", "settings": { "title": "Shop" } },
+        { "type": "menu", "settings": { "title": "About" } },
+        {
+          "type": "text",
+          "settings": {
+            "title": "Get in touch",
+            "email": "hello@purelane.com",
+            "phone": "+91 9930 123 234",
+            "legal": "Purelane Eco Products Pvt Ltd"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
