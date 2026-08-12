@@ -35,7 +35,7 @@
   assign card_sizes = '(min-width: 860px) ' | append: col_width | append: 'px, 44vw'
 -%}
 
-<div class="pl pl-sec" data-pl-scene="{{ section.settings.scene }}">
+<div class="pl pl-sec" {% if section.settings.anchor != blank %}id="{{ section.settings.anchor | handle }}"{% endif %} data-pl-scene="{{ section.settings.scene }}">
   <div class="pl-wrap">
 
     {% render 'purelane-section-head',
@@ -113,6 +113,13 @@
   "tag": "section",
   "class": "purelane-section purelane-section--shop",
   "settings": [
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Anchor id",
+      "info": "Lets links and the progress rail jump here, e.g. shop. Omit the #.",
+      "default": "shop"
+    },
     {
       "type": "header",
       "content": "Heading"

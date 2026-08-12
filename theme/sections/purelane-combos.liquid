@@ -27,7 +27,7 @@
 
 <script src="{{ 'purelane-reveal.js' | asset_url }}" defer></script>
 
-<div class="pl pl-sec" data-pl-scene="{{ section.settings.scene }}">
+<div class="pl pl-sec" {% if section.settings.anchor != blank %}id="{{ section.settings.anchor | handle }}"{% endif %} data-pl-scene="{{ section.settings.scene }}">
   <div class="pl-wrap">
 
     {% render 'purelane-section-head',
@@ -217,6 +217,13 @@
   "tag": "section",
   "class": "purelane-section purelane-section--combos",
   "settings": [
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Anchor id",
+      "info": "Lets links and the progress rail jump here, e.g. shop. Omit the #.",
+      "default": "combos"
+    },
     {
       "type": "header",
       "content": "Heading"

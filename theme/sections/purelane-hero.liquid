@@ -40,6 +40,7 @@
 
 <div
   class="pl pl-hero"
+  {% if section.settings.anchor != blank %}id="{{ section.settings.anchor | handle }}"{% endif %}
   data-pl-scene="{{ section.settings.scene }}"
   style="
     --pl-hero-pad-top: {{ section.settings.padding_top }}px;
@@ -229,6 +230,13 @@
   "tag": "section",
   "class": "purelane-section purelane-section--hero",
   "settings": [
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Anchor id",
+      "info": "Lets links and the progress rail jump here, e.g. shop. Omit the #.",
+      "default": "top"
+    },
     {
       "type": "header",
       "content": "Headline"

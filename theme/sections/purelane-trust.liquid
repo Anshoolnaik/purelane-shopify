@@ -11,7 +11,7 @@
 <script src="{{ 'purelane-reveal.js' | asset_url }}" defer></script>
 
 {%- if section.blocks.size > 0 -%}
-  <div class="pl pl-sec" data-pl-scene="{{ section.settings.scene }}">
+  <div class="pl pl-sec" {% if section.settings.anchor != blank %}id="{{ section.settings.anchor | handle }}"{% endif %} data-pl-scene="{{ section.settings.scene }}">
     <div class="pl-wrap">
       <div
         class="pl-glass pl-trust pl-rv"
@@ -34,6 +34,13 @@
   "tag": "section",
   "class": "purelane-section purelane-section--trust",
   "settings": [
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Anchor id",
+      "info": "Lets links and the progress rail jump here, e.g. shop. Omit the #.",
+      "default": ""
+    },
     {
       "type": "range",
       "id": "columns",

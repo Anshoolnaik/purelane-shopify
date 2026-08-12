@@ -28,7 +28,7 @@
   assign rotator_products = section.blocks | where: 'type', 'rotator_product'
 -%}
 
-<div class="pl pl-sec" data-pl-scene="{{ section.settings.scene }}">
+<div class="pl pl-sec" {% if section.settings.anchor != blank %}id="{{ section.settings.anchor | handle }}"{% endif %} data-pl-scene="{{ section.settings.scene }}">
   <div class="pl-wrap">
     <div class="pl-glass pl-sec-pad pl-rv">
       <div class="pl-proof">
@@ -136,6 +136,13 @@
   "tag": "section",
   "class": "purelane-section purelane-section--proof",
   "settings": [
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Anchor id",
+      "info": "Lets links and the progress rail jump here, e.g. shop. Omit the #.",
+      "default": "proof"
+    },
     {
       "type": "text",
       "id": "kicker",

@@ -24,7 +24,7 @@
   assign duration = section.settings.speed | append: 's'
 -%}
 
-<div class="pl pl-reviews" data-pl-scene="{{ section.settings.scene }}">
+<div class="pl pl-reviews" {% if section.settings.anchor != blank %}id="{{ section.settings.anchor | handle }}"{% endif %} data-pl-scene="{{ section.settings.scene }}">
 
   {%- if section.settings.kicker != blank
     or section.settings.rating_summary != blank
@@ -138,6 +138,13 @@
   "tag": "section",
   "class": "purelane-section purelane-section--reviews",
   "settings": [
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Anchor id",
+      "info": "Lets links and the progress rail jump here, e.g. shop. Omit the #.",
+      "default": "reviews"
+    },
     {
       "type": "header",
       "content": "Summary"
