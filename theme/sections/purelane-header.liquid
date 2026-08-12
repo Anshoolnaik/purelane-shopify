@@ -1,0 +1,200 @@
+{%- comment -%}
+  PURELANE — HEADER
+  The floating navigation pill.
+
+  Navigation comes from a Shopify menu rather than hardcoded links, so a
+  merchant edits it in Navigation and it stays right across the storefront.
+  The cart count is the real cart, not the prototype's literal "0".
+
+  The prototype's burger button had nothing behind it — no menu, no handler.
+  There is a real disclosure panel here, with aria-expanded, Escape to close
+  and focus returned to the button.
+
+  Place this in the header group in place of Dawn's header, or alongside it if
+  you only want it on the homepage.
+{%- endcomment -%}
+
+{{ 'purelane-tokens.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-base.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-chrome.css' | asset_url | stylesheet_tag }}
+
+<script src="{{ 'purelane-chrome.js' | asset_url }}" defer></script>
+
+{%- liquid
+  assign menu = section.settings.menu
+  assign menu_id = 'purelane-menu-' | append: section.id
+-%}
+
+<header
+  class="pl pl-header"
+  data-pl-header
+  style="--pl-header-top: {{ section.settings.offset_top }}px;"
+>
+  <div class="pl-header__pill pl-glass">
+
+    <a class="pl-brand" href="{{ routes.root_url }}">
+      <span class="pl-brand__mark">
+        {%- if section.settings.logo != blank -%}
+          {{
+            section.settings.logo
+            | image_url: width: 120
+            | image_tag: loading: 'eager', widths: '40,80,120', sizes: '40px', alt: shop.name
+          }}
+        {%- else -%}
+          {% render 'purelane-icon', name: 'logo' %}
+        {%- endif -%}
+      </span>
+
+      <span class="pl-brand__text">
+        <span class="pl-brand__name">{{ section.settings.brand_name | default: shop.name }}</span>
+        {%- if section.settings.tagline != blank -%}
+          <span class="pl-brand__tagline">{{ section.settings.tagline }}</span>
+        {%- endif -%}
+      </span>
+    </a>
+
+    {%- if menu != blank and menu.links.size > 0 -%}
+      <nav class="pl-nav" aria-label="{{ section.settings.nav_label | default: 'Main' | escape }}">
+        {%- for link in menu.links -%}
+          <a
+            href="{{ link.url }}"
+            {% if link.current %}aria-current="page"{% endif %}
+          >{{ link.title }}</a>
+        {%- endfor -%}
+      </nav>
+    {%- endif -%}
+
+    <div class="pl-header__tools">
+      {%- if section.settings.show_search -%}
+        <a class="pl-icobtn pl-icobtn--optional" href="{{ routes.search_url }}" aria-label="Search">
+          {% render 'purelane-icon', name: 'search' %}
+        </a>
+      {%- endif -%}
+
+      {%- if section.settings.show_account and shop.customer_accounts_enabled -%}
+        <a class="pl-icobtn pl-icobtn--optional" href="{{ routes.account_url }}" aria-label="Account">
+          {% render 'purelane-icon', name: 'account' %}
+        </a>
+      {%- endif -%}
+
+      {%- comment -%}
+        The prototype hardcoded aria-label="Cart, 0 items" and a literal 0
+        badge. Both read from the real cart, and the count is pluralised.
+      {%- endcomment -%}
+      <a
+        class="pl-icobtn"
+        href="{{ routes.cart_url }}"
+        aria-label="Cart, {{ cart.item_count }} {% if cart.item_count == 1 %}item{% else %}items{% endif %}"
+      >
+        {% render 'purelane-icon', name: 'cart' %}
+        {%- if cart.item_count > 0 -%}
+          <span class="pl-icobtn__count" aria-hidden="true">{{ cart.item_count }}</span>
+        {%- endif -%}
+      </a>
+
+      {%- if menu != blank and menu.links.size > 0 -%}
+        <button
+          type="button"
+          class="pl-icobtn pl-header__burger"
+          data-pl-menu-toggle
+          aria-expanded="false"
+          aria-controls="{{ menu_id }}"
+          aria-label="{{ section.settings.menu_label | default: 'Menu' | escape }}"
+        >
+          {% render 'purelane-icon', name: 'menu' %}
+        </button>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- if menu != blank and menu.links.size > 0 -%}
+    <nav
+      class="pl-menu pl-glass"
+      id="{{ menu_id }}"
+      data-pl-menu
+      aria-label="{{ section.settings.menu_label | default: 'Menu' | escape }}"
+      hidden
+    >
+      {%- for link in menu.links -%}
+        <a href="{{ link.url }}" {% if link.current %}aria-current="page"{% endif %}>
+          {{- link.title -}}
+        </a>
+      {%- endfor -%}
+    </nav>
+  {%- endif -%}
+</header>
+
+{% schema %}
+{
+  "name": "Purelane header",
+  "tag": "div",
+  "class": "purelane-header-host",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo",
+      "info": "Leave empty to use the built-in mark."
+    },
+    {
+      "type": "text",
+      "id": "brand_name",
+      "label": "Brand name",
+      "info": "Defaults to the store name.",
+      "default": "Purelane"
+    },
+    {
+      "type": "text",
+      "id": "tagline",
+      "label": "Tagline",
+      "default": "Clean, simply"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "text",
+      "id": "nav_label",
+      "label": "Navigation accessible label",
+      "default": "Main"
+    },
+    {
+      "type": "text",
+      "id": "menu_label",
+      "label": "Mobile menu button label",
+      "default": "Menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Show search",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_account",
+      "label": "Show account",
+      "info": "Hidden automatically if customer accounts are disabled.",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "offset_top",
+      "label": "Distance from the top",
+      "info": "Increase if an announcement bar sits above the header.",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "default": 38
+    }
+  ],
+  "presets": [
+    {
+      "name": "Purelane header"
+    }
+  ]
+}
+{% endschema %}
