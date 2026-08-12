@@ -1,0 +1,497 @@
+{%- comment -%}
+  PURELANE — HERO
+  ---------------------------------------------------------------------------
+  The opening screen: headline, promises, and a product stage that cycles
+  through a one / two / three bottle composition with a price flag.
+
+  Merchant model
+  - Promise badges are blocks, so they can be added, removed and reordered.
+    Each carries a short label as well as a long one, because the prototype
+    used shorter wording in the mobile strip than in the desktop rail.
+  - Each stage composition is a block holding up to three real products. Price
+    comes from a real product too: the single-bottle slide reads its own
+    product's price, and the multi-buy slides point at the bundle product that
+    actually sells at that price. Nothing about the price is typed by hand.
+
+  Accessibility
+  - The stage is a labelled group with real <button> controls carrying
+    aria-current, and a live region announcing the active composition.
+  - Autoplay stops on hover, on focus, when the stage scrolls out of view, and
+    entirely under prefers-reduced-motion.
+
+  Theme editor
+  - Selecting a slide block in the editor jumps the stage to it, so a merchant
+    editing slide 3 is not left looking at slide 1.
+{%- endcomment -%}
+
+{{ 'purelane-tokens.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-base.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-silhouettes.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-hero.css' | asset_url | stylesheet_tag }}
+
+<script src="{{ 'purelane-reveal.js' | asset_url }}" defer></script>
+<script src="{{ 'purelane-hero.js' | asset_url }}" defer></script>
+
+{%- liquid
+  assign badges = section.blocks | where: 'type', 'badge'
+  assign slides = section.blocks | where: 'type', 'slide'
+  assign heading_html = section.settings.heading | escape | newline_to_br
+-%}
+
+<div
+  class="pl pl-hero"
+  data-pl-scene="{{ section.settings.scene }}"
+  style="
+    --pl-hero-pad-top: {{ section.settings.padding_top }}px;
+    --pl-hero-pad-top-mobile: {{ section.settings.padding_top_mobile }}px;
+    --pl-hero-min-height: {{ section.settings.min_height }}svh;
+  "
+>
+  <div class="pl-hero__grid">
+
+    {%- if badges.size > 0 -%}
+      <div class="pl-hero__badges pl-glass-2" aria-label="Product promises">
+        {%- for block in badges -%}
+          <div class="pl-hero__badge" {{ block.shopify_attributes }}>
+            <span class="pl-hero__badge-icon">
+              {% render 'purelane-icon', name: block.settings.icon %}
+            </span>
+            <span>{{ block.settings.label | escape | newline_to_br }}</span>
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    <div class="pl-hero__copy">
+      {%- if section.settings.heading != blank or section.settings.heading_accent != blank -%}
+        <h1 class="pl-d1 pl-hero__title pl-rv is-in">
+          {{- heading_html -}}
+          {%- if section.settings.heading_accent != blank -%}
+            {%- if section.settings.heading != blank %}<br>{% endif -%}
+            <span class="pl-accent-text">{{ section.settings.heading_accent }}</span>
+          {%- endif -%}
+        </h1>
+      {%- endif -%}
+
+      {%- if section.settings.show_rule -%}
+        <div class="pl-rule pl-rv pl-rv--d1" aria-hidden="true">
+          <i></i>
+          {% render 'purelane-icon', name: 'leaf' %}
+          <i></i>
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.lede != blank -%}
+        <p class="pl-lede pl-rv pl-rv--d2">{{ section.settings.lede }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.cta_primary_label != blank or section.settings.cta_secondary_label != blank -%}
+        <div class="pl-hero__cta pl-rv pl-rv--d3">
+          {%- if section.settings.cta_primary_label != blank -%}
+            <a class="pl-btn pl-btn--primary" href="{{ section.settings.cta_primary_link | default: '#' }}">
+              {{ section.settings.cta_primary_label }}
+              {% render 'purelane-icon', name: 'arrow-right' %}
+            </a>
+          {%- endif -%}
+
+          {%- if section.settings.cta_secondary_label != blank -%}
+            <a class="pl-btn pl-btn--ghost" href="{{ section.settings.cta_secondary_link | default: '#' }}">
+              {{ section.settings.cta_secondary_label }}
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- comment -%}
+        The narrow-screen echo of the badge rail. Same blocks, shorter labels.
+        It is a separate node rather than a reflow of the rail because the two
+        sit in different places in the layout; only one is ever displayed.
+      {%- endcomment -%}
+      {%- if badges.size > 0 -%}
+        <div class="pl-hero__strip pl-rv pl-rv--d4" aria-hidden="true">
+          {%- for block in badges -%}
+            <div class="pl-glass-2">
+              {% render 'purelane-icon', name: block.settings.icon %}
+              {{ block.settings.label_short | default: block.settings.label }}
+            </div>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- if slides.size > 0 -%}
+      <div
+        class="pl-hero__prod"
+        data-pl-hero-stage
+        data-autoplay="{{ section.settings.autoplay }}"
+        data-interval="{{ section.settings.autoplay_interval | times: 1000 }}"
+        role="group"
+        aria-roledescription="carousel"
+        aria-label="{{ section.settings.stage_label | default: 'Product bundles' | escape }}"
+      >
+        <div class="pl-hero__stage" data-pl-hero-track>
+          {%- for block in slides -%}
+            {%- liquid
+              assign shots = ''
+              if block.settings.product_1 != blank
+                assign shots = shots | append: 'a,'
+              endif
+              if block.settings.product_2 != blank
+                assign shots = shots | append: 'b,'
+              endif
+              if block.settings.product_3 != blank
+                assign shots = shots | append: 'c,'
+              endif
+              assign shot_keys = shots | split: ','
+              assign shot_count = shot_keys.size
+
+              comment
+                Price source: an explicit bundle product if the merchant set
+                one, otherwise the first product on the slide. That makes the
+                single-bottle slide correct with no extra configuration.
+              endcomment
+              assign price_product = block.settings.price_product | default: block.settings.product_1
+            -%}
+
+            <div
+              class="pl-hero__slide pl-hero__slide--x{{ shot_count }}{% if forloop.first %} is-active{% endif %}"
+              data-pl-hero-slide
+              data-index="{{ forloop.index0 }}"
+              {% unless forloop.first %}aria-hidden="true"{% endunless %}
+              {{ block.shopify_attributes }}
+            >
+              {%- for key in shot_keys -%}
+                {%- liquid
+                  case key
+                    when 'a'
+                      assign shot_product = block.settings.product_1
+                    when 'b'
+                      assign shot_product = block.settings.product_2
+                    else
+                      assign shot_product = block.settings.product_3
+                  endcase
+                -%}
+                {% render 'purelane-product-media',
+                  product: shot_product,
+                  class: 'pl-hero__shot pl-hero__shot--' | append: key | append: ' pl-hero__shot--s' | append: forloop.index,
+                  sizes: '(min-width: 901px) min(50vw, 560px), 88vw',
+                  loading: 'eager',
+                  fetchpriority: 'high'
+                %}
+              {%- endfor -%}
+
+              {%- if price_product != blank -%}
+                <div class="pl-hero__tag pl-glass-2">
+                  {%- if block.settings.label != blank -%}
+                    <span class="pl-hero__tag-label">{{ block.settings.label }}</span>
+                  {%- endif -%}
+                  {% render 'purelane-price',
+                    product: price_product,
+                    saving: block.settings.saving_style
+                  %}
+                </div>
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
+        </div>
+
+        {%- if slides.size > 1 -%}
+          <div class="pl-hero__dots" data-pl-hero-dots>
+            {%- for block in slides -%}
+              <button
+                type="button"
+                data-pl-hero-dot
+                data-index="{{ forloop.index0 }}"
+                aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+              >
+                <span class="pl-visually-hidden">
+                  {{- block.settings.label | default: 'Composition ' | append: forloop.index -}}
+                </span>
+              </button>
+            {%- endfor -%}
+          </div>
+
+          {%- comment -%}
+            Announces the active composition to screen readers. Without it the
+            stage changes silently.
+          {%- endcomment -%}
+          <p class="pl-visually-hidden" aria-live="polite" data-pl-hero-status></p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Purelane hero",
+  "tag": "section",
+  "class": "purelane-section purelane-section--hero",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Headline"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Each line breaks where you press Enter.",
+      "default": "Clean\nThat"
+    },
+    {
+      "type": "text",
+      "id": "heading_accent",
+      "label": "Accent line",
+      "info": "Shown in the brand accent colour on its own line.",
+      "default": "Lasts"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rule",
+      "label": "Show leaf divider",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "lede",
+      "label": "Supporting text",
+      "default": "<p>Homecare that works on the toughest grime, made from plants. Kind to your home, your family and the world outside it.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Buttons"
+    },
+    {
+      "type": "text",
+      "id": "cta_primary_label",
+      "label": "Primary button label",
+      "default": "Shop now"
+    },
+    {
+      "type": "url",
+      "id": "cta_primary_link",
+      "label": "Primary button link"
+    },
+    {
+      "type": "text",
+      "id": "cta_secondary_label",
+      "label": "Secondary button label",
+      "default": "How it works"
+    },
+    {
+      "type": "url",
+      "id": "cta_secondary_link",
+      "label": "Secondary button link"
+    },
+    {
+      "type": "header",
+      "content": "Product stage"
+    },
+    {
+      "type": "text",
+      "id": "stage_label",
+      "label": "Stage accessible label",
+      "info": "Describes the stage to screen reader users.",
+      "default": "Product bundles"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Cycle automatically",
+      "info": "Always disabled for visitors who prefer reduced motion.",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_interval",
+      "label": "Seconds per composition",
+      "min": 2,
+      "max": 10,
+      "step": 0.5,
+      "unit": "s",
+      "default": 3.8
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "min_height",
+      "label": "Minimum height",
+      "min": 60,
+      "max": 100,
+      "step": 5,
+      "unit": "vh",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding (desktop)",
+      "info": "Clears the header. Increase if your header overlaps the headline.",
+      "min": 60,
+      "max": 240,
+      "step": 2,
+      "unit": "px",
+      "default": 150
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Top padding (mobile)",
+      "min": 40,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "default": 118
+    },
+    {
+      "type": "range",
+      "id": "scene",
+      "label": "Backdrop depth",
+      "info": "Which backdrop gradient shows while this section is in view. 1 is the shallowest.",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 1
+    }
+  ],
+  "blocks": [
+    {
+      "type": "badge",
+      "name": "Promise badge",
+      "limit": 5,
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "leaf", "label": "Leaf" },
+            { "value": "shield-check", "label": "Shield" },
+            { "value": "no-chem", "label": "No chemicals" },
+            { "value": "heart", "label": "Heart" },
+            { "value": "globe", "label": "Globe" },
+            { "value": "box", "label": "Packaging" },
+            { "value": "truck", "label": "Shipping" }
+          ],
+          "default": "leaf"
+        },
+        {
+          "type": "textarea",
+          "id": "label",
+          "label": "Label",
+          "info": "Press Enter to control where the line breaks.",
+          "default": "Plant\npowered"
+        },
+        {
+          "type": "text",
+          "id": "label_short",
+          "label": "Short label (mobile)",
+          "info": "Optional. Falls back to the label above.",
+          "default": "Plant powered"
+        }
+      ]
+    },
+    {
+      "type": "slide",
+      "name": "Stage composition",
+      "limit": 5,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Single bottle"
+        },
+        {
+          "type": "product",
+          "id": "product_1",
+          "label": "Product 1"
+        },
+        {
+          "type": "product",
+          "id": "product_2",
+          "label": "Product 2"
+        },
+        {
+          "type": "product",
+          "id": "product_3",
+          "label": "Product 3"
+        },
+        {
+          "type": "product",
+          "id": "price_product",
+          "label": "Price comes from",
+          "info": "The product that actually sells at this price, e.g. the bundle SKU. Leave empty to use Product 1."
+        },
+        {
+          "type": "select",
+          "id": "saving_style",
+          "label": "Show saving as",
+          "options": [
+            { "value": "percent", "label": "Percentage off" },
+            { "value": "amount", "label": "Amount saved" }
+          ],
+          "default": "percent"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Purelane hero",
+      "blocks": [
+        {
+          "type": "badge",
+          "settings": {
+            "icon": "leaf",
+            "label": "Plant\npowered",
+            "label_short": "Plant powered"
+          }
+        },
+        {
+          "type": "badge",
+          "settings": {
+            "icon": "shield-check",
+            "label": "Safe for\nkids & pets",
+            "label_short": "Kids & pet safe"
+          }
+        },
+        {
+          "type": "badge",
+          "settings": {
+            "icon": "no-chem",
+            "label": "Zero harsh\nchemicals",
+            "label_short": "Zero harsh chem"
+          }
+        },
+        {
+          "type": "slide",
+          "settings": {
+            "label": "Single bottle",
+            "saving_style": "percent"
+          }
+        },
+        {
+          "type": "slide",
+          "settings": {
+            "label": "Any 2 products",
+            "saving_style": "amount"
+          }
+        },
+        {
+          "type": "slide",
+          "settings": {
+            "label": "Any 3 products",
+            "saving_style": "amount"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
