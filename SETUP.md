@@ -100,43 +100,70 @@ On each core product set:
 
 ## 4. Install the theme
 
-Dawn must already be the live theme (it is, on a fresh store).
+**`theme/` is a partial theme on purpose.** It has assets, sections, snippets
+and one template — but no `layout/`, `config/` or `locales/`, because those
+belong to Dawn. Running `shopify theme dev` on `theme/` directly will not work.
+It has to be merged into a Dawn checkout first.
+
+### Install the CLI
 
 ```bash
-# once
 npm install -g @shopify/cli@latest
+```
 
-# from the repository root
-cd theme
+The current CLI needs **Node 22.8 or newer**. On older Node you will see
+`does not provide an export named 'enableCompileCache'` — pin the CLI instead:
+
+```bash
+npm install -g @shopify/cli@3.70.0
+```
+
+### Pull Dawn, merge, run
+
+```bash
+# 1. authenticate and pull the store's live theme (Dawn) into ../dawn
+shopify theme pull --store your-store.myshopify.com --path ../dawn
+
+# 2. copy the Purelane sections in, and add the two font links
+node scripts/install-into-dawn.mjs ../dawn
+
+# 3. run it
+cd ../dawn
 shopify theme dev --store your-store.myshopify.com
 ```
 
-`shopify theme dev` uploads this directory over the current theme and hot
-reloads. To push a permanent copy instead:
+Step 1 opens a browser to log in. Step 3 prints a preview URL and hot reloads
+as you edit.
+
+Add `--dry-run` to step 2 to see what it would touch without writing anything.
+
+The script copies 51 files. The **only** Dawn file it replaces is
+`templates/index.json` — the homepage this build exists to replace. Everything
+else is new. It also adds the Outfit and Inter `<link>` tags to
+`layout/theme.liquid`, which is the single edit to a Dawn file this project
+needs, and it is idempotent — re-running will not duplicate them. See
+[BUILD-NOTES.md](BUILD-NOTES.md) §6.1 for why the fonts are not self-hosted yet.
+
+### Publishing a copy instead of running the dev server
 
 ```bash
+cd ../dawn
 shopify theme push --store your-store.myshopify.com --unpublished --theme "Purelane"
 ```
 
-If you would rather not use the CLI, copy the contents of `theme/assets`,
-`theme/sections`, `theme/snippets` and `theme/templates` into Dawn through
-**Online Store → Themes → Edit code**. Every file is additive — nothing in this
-repository overwrites a Dawn file.
+### Without the CLI
 
-### Fonts
+Copy the contents of `theme/assets`, `theme/sections`, `theme/snippets` and
+`theme/templates` into Dawn through **Online Store → Themes → Edit code**, then
+add the font links to `layout/theme.liquid` by hand.
 
-The design uses Outfit and Inter. Add this to Dawn's `layout/theme.liquid`
-inside `<head>`:
+### Checking the code without a store
 
-```liquid
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+Theme Check runs offline and needs no authentication:
+
+```bash
+cd theme && shopify theme check
 ```
-
-This is the one change to a Dawn file. It matches the prototype exactly. See
-[BUILD-NOTES.md](BUILD-NOTES.md) for why the fonts are not self-hosted yet and
-what that costs.
 
 ### Header and footer
 
