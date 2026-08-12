@@ -1,0 +1,53 @@
+/* ==========================================================================
+   PURELANE — SIGNUP
+   ========================================================================== */
+
+.pl-signup {
+  padding: clamp(28px, 4vw, 46px);
+  text-align: center;
+}
+
+.pl-signup .pl-d2 { margin-bottom: 12px; }
+
+.pl-signup .pl-lede { margin: 0 auto; }
+
+.pl-signup__form {
+  display: flex;
+  gap: 9px;
+  max-width: 430px;
+  margin: 22px auto 0;
+  flex-wrap: wrap;
+}
+
+.pl-signup__field {
+  flex: 1;
+  min-width: 180px;
+  height: 46px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--pl-teal-ink);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--pl-line-mid);
+}
+
+.pl-signup__field::placeholder { color: var(--pl-paper-3); }
+
+.pl-signup__field:focus {
+  outline: none;
+  border-color: var(--pl-accent);
+  background: #fff;
+}
+
+/* The prototype had no way to succeed or fail — its form was
+   `onsubmit="return false"`. A real form needs both states. */
+.pl-signup__message {
+  flex: 1 0 100%;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.pl-signup__message--success { color: var(--pl-leaf); }
+
+.pl-signup__message--error { color: #a3341f; }
