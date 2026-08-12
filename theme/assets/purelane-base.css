@@ -260,6 +260,71 @@
 }
 
 /* --------------------------------------------------------------------------
+   Visually hidden
+   Used to give screen readers the labels the prototype's decorative glyphs
+   (★★★★★, a bare <s> price) could not carry on their own.
+   -------------------------------------------------------------------------- */
+.pl-visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Price
+   Shared skeleton only. Each section sets its own type sizes, matching the
+   three different treatments the prototype used (card, combo, tier).
+   -------------------------------------------------------------------------- */
+.pl-price {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pl-price__now {
+  font-family: var(--pl-font-display);
+  font-weight: 700;
+  color: var(--pl-surface);
+}
+
+.pl-price__was { color: var(--pl-paper-3); }
+
+.pl-price__save {
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--pl-leaf);
+}
+
+/* --------------------------------------------------------------------------
+   Rating
+   -------------------------------------------------------------------------- */
+.pl-rate {
+  font-size: 11.5px;
+  color: var(--pl-paper-2);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pl-rate b {
+  color: var(--pl-accent);
+  font-weight: 700;
+}
+
+.pl-stars {
+  color: var(--pl-leaf-lt);
+  letter-spacing: 0.2em;
+}
+
+/* --------------------------------------------------------------------------
    Product shot
    Height-driven, exactly like the prototype's `.pimg`: each section sets a
    height and the width follows from the image's own aspect ratio. Applies to
