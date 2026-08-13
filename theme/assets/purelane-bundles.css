@@ -28,7 +28,7 @@
 
 .pl-tier:hover { transform: translateY(-5px); }
 
-.pl-tier--featured {
+.pl-tiers .pl-tier--featured {
   border-color: rgba(201, 118, 29, 0.46);
   box-shadow:
     0 22px 54px rgba(58, 44, 112, 0.14),

@@ -57,8 +57,16 @@
 
 /* --------------------------------------------------------------------------
    Vertical badge rail (wide screens)
+
+   Scoped under .pl-hero deliberately. This element also carries .pl-glass-2,
+   which sets `position: relative` in purelane-base.css. Base is loaded by
+   every section, so it appears many times in the document and its LAST
+   occurrence lands after this file — meaning a single-class selector here
+   loses to it, the rail drops into normal flow, and it pushes the whole hero
+   copy off screen. The extra class raises specificity so section rules beat
+   shared primitives regardless of load order. Same applies to the price flag.
    -------------------------------------------------------------------------- */
-.pl-hero__badges {
+.pl-hero .pl-hero__badges {
   position: absolute;
   right: 18px;
   top: 50%;
@@ -207,7 +215,7 @@
 /* --------------------------------------------------------------------------
    Price flag
    -------------------------------------------------------------------------- */
-.pl-hero__tag {
+.pl-hero .pl-hero__tag {
   position: absolute;
   left: 0;
   bottom: 2%;
@@ -348,7 +356,7 @@
 
   .pl-hero__stage { height: clamp(300px, 44svh, 430px); }
 
-  .pl-hero__tag {
+  .pl-hero .pl-hero__tag {
     padding: 9px 12px 10px;
     border-radius: 14px;
     max-width: 58%;

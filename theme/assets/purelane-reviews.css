@@ -63,7 +63,7 @@
 }
 
 /* --- Card ---------------------------------------------------------------- */
-.pl-review {
+.pl-reviews__track .pl-review {
   flex: 0 0 auto;
   width: 284px;
   padding: 15px 17px;

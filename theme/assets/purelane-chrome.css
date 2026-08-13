@@ -19,7 +19,7 @@
 
 .pl-header.is-up { top: 10px; }
 
-.pl-header__pill {
+.pl-header .pl-header__pill {
   max-width: var(--pl-maxw);
   margin: 0 auto;
   display: flex;
@@ -178,7 +178,7 @@
    The prototype's burger button was inert — there was no menu behind it. This
    is a real disclosure panel.
    -------------------------------------------------------------------------- */
-.pl-menu {
+.pl-header .pl-menu {
   max-width: var(--pl-maxw);
   margin: 8px auto 0;
   padding: 14px 18px;
