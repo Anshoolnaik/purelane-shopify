@@ -81,21 +81,29 @@
           "type": "slide",
           "settings": {
             "label": "Single bottle",
-            "saving_style": "percent"
+            "saving_style": "percent",
+            "product_1": "kitchen-cleaner-foaming"
           }
         },
         "s2": {
           "type": "slide",
           "settings": {
             "label": "Any 2 products",
-            "saving_style": "amount"
+            "saving_style": "amount",
+            "product_1": "tap-cleaner-limescale-remover",
+            "product_2": "kitchen-cleaner-foaming",
+            "price_product": "build-your-box-2"
           }
         },
         "s3": {
           "type": "slide",
           "settings": {
             "label": "Any 3 products",
-            "saving_style": "amount"
+            "saving_style": "amount",
+            "product_1": "tap-cleaner-limescale-remover",
+            "product_2": "copper-bronze-brass-cleaner",
+            "product_3": "kitchen-cleaner-foaming",
+            "price_product": "build-your-box-3"
           }
         }
       },
@@ -334,9 +342,51 @@
             "label": "Rated",
             "note": "Across 8,000+ verified reviews"
           }
+        },
+        "rp1": {
+          "type": "rotator_product",
+          "settings": {
+            "product": "kitchen-cleaner-foaming"
+          }
+        },
+        "rp2": {
+          "type": "rotator_product",
+          "settings": {
+            "product": "tap-cleaner-limescale-remover"
+          }
+        },
+        "rp3": {
+          "type": "rotator_product",
+          "settings": {
+            "product": "non-toxic-laundry-detergent"
+          }
+        },
+        "rp4": {
+          "type": "rotator_product",
+          "settings": {
+            "product": "non-toxic-toilet-cleaner"
+          }
+        },
+        "rp5": {
+          "type": "rotator_product",
+          "settings": {
+            "product": "natural-herbal-floor-cleaner"
+          }
+        },
+        "rp6": {
+          "type": "rotator_product",
+          "settings": {
+            "product": "organic-dishwash-liquid-gel"
+          }
         }
       },
       "block_order": [
+        "rp1",
+        "rp2",
+        "rp3",
+        "rp4",
+        "rp5",
+        "rp6",
         "s1",
         "s2",
         "s3",
@@ -363,7 +413,11 @@
             "flag_label": "Most popular",
             "includes": "Includes: Foaming Kitchen Cleaner, Dishwash Gel & Tap Cleaner. Everything for a sparkling kitchen, no need to pick separately.",
             "fine_print": "Inclusive of all taxes · COD available",
-            "cta_label": "Shop bundle"
+            "cta_label": "Shop bundle",
+            "bundle_product": "kitchen-essentials-combo",
+            "product_1": "kitchen-cleaner-foaming",
+            "product_2": "organic-dishwash-liquid-gel",
+            "product_3": "tap-cleaner-limescale-remover"
           }
         },
         "c2": {
@@ -372,7 +426,10 @@
             "title": "Laundry care bundle",
             "includes": "Includes: Laundry Detergent, Fabric Conditioner & Machine Cleaner Powder. Softer, fresher wash, all in one box.",
             "fine_print": "Inclusive of all taxes · COD available",
-            "cta_label": "Shop bundle"
+            "cta_label": "Shop bundle",
+            "bundle_product": "laundry-care-bundle",
+            "product_1": "non-toxic-laundry-detergent",
+            "product_2": "washing-machine-cleaner-descaler"
           }
         },
         "c3": {
@@ -384,7 +441,11 @@
             "featured": true,
             "includes": "Includes: Kitchen Cleaner, Laundry Detergent, Floor Cleaner, Toilet Cleaner & Handwash. Our biggest saving box.",
             "fine_print": "Inclusive of all taxes · COD available",
-            "cta_label": "Shop bundle"
+            "cta_label": "Shop bundle",
+            "bundle_product": "complete-home-bundle",
+            "product_1": "kitchen-cleaner-foaming",
+            "product_2": "natural-herbal-floor-cleaner",
+            "product_3": "gentle-hydrating-liquid-handwash"
           }
         },
         "c4": {
@@ -393,7 +454,11 @@
             "title": "Bathroom deep clean",
             "includes": "Includes: Toilet Cleaner, Tap Cleaner & Magic Eraser. A complete bathroom refresh in one box.",
             "fine_print": "Inclusive of all taxes · COD available",
-            "cta_label": "Shop bundle"
+            "cta_label": "Shop bundle",
+            "bundle_product": "bathroom-deep-clean",
+            "product_1": "non-toxic-toilet-cleaner",
+            "product_2": "tap-cleaner-limescale-remover",
+            "product_3": "magic-eraser"
           }
         },
         "c5": {
@@ -402,7 +467,10 @@
             "title": "Hard water solution kit",
             "includes": "Includes: Tap Cleaner & Toilet Cleaner. A quick, focused fix for hard water stains across the home.",
             "fine_print": "Inclusive of all taxes · COD available",
-            "cta_label": "Shop bundle"
+            "cta_label": "Shop bundle",
+            "bundle_product": "hard-water-solution-kit",
+            "product_1": "tap-cleaner-limescale-remover",
+            "product_2": "non-toxic-toilet-cleaner"
           }
         }
       },
@@ -434,7 +502,10 @@
             "quantity_label": "Products",
             "unit_template": "Flat {price} per product",
             "features": "Pick any two products\nFree shipping across India",
-            "cta_label": "Build this box"
+            "cta_label": "Build this box",
+            "bundle_product": "build-your-box-2",
+            "product_1": "tap-cleaner-limescale-remover",
+            "product_2": "kitchen-cleaner-foaming"
           }
         },
         "t2": {
@@ -446,7 +517,11 @@
             "unit_template": "Flat {price} per product",
             "featured": true,
             "features": "Pick any three products\nCovers kitchen and laundry\nFree shipping across India",
-            "cta_label": "Build this box"
+            "cta_label": "Build this box",
+            "bundle_product": "build-your-box-3",
+            "product_1": "kitchen-cleaner-foaming",
+            "product_2": "tap-cleaner-limescale-remover",
+            "product_3": "organic-dishwash-liquid-gel"
           }
         },
         "t3": {
@@ -457,7 +532,13 @@
             "quantity_label": "Products",
             "unit_template": "Flat {price} per product",
             "features": "Pick any five products\nEvery room in one order\nFree shipping across India",
-            "cta_label": "Build this box"
+            "cta_label": "Build this box",
+            "bundle_product": "build-your-box-5",
+            "product_1": "kitchen-cleaner-foaming",
+            "product_2": "tap-cleaner-limescale-remover",
+            "product_3": "natural-herbal-floor-cleaner",
+            "product_4": "non-toxic-toilet-cleaner",
+            "product_5": "non-toxic-laundry-detergent"
           }
         }
       },
@@ -483,12 +564,72 @@
         "kicker": "Bestsellers",
         "heading": "Loved by 30,000 homes",
         "show_rule": true,
-        "source": "collection",
+        "source": "manual",
         "products_to_show": 8,
         "columns_desktop": 4,
         "card_heading_level": "h3",
         "scene": 3
-      }
+      },
+      "blocks": {
+        "p1": {
+          "type": "product",
+          "settings": {
+            "product": "tap-cleaner-limescale-remover"
+          }
+        },
+        "p2": {
+          "type": "product",
+          "settings": {
+            "product": "kitchen-cleaner-foaming"
+          }
+        },
+        "p3": {
+          "type": "product",
+          "settings": {
+            "product": "copper-bronze-brass-cleaner"
+          }
+        },
+        "p4": {
+          "type": "product",
+          "settings": {
+            "product": "washing-machine-cleaner-descaler"
+          }
+        },
+        "p5": {
+          "type": "product",
+          "settings": {
+            "product": "non-toxic-toilet-cleaner"
+          }
+        },
+        "p6": {
+          "type": "product",
+          "settings": {
+            "product": "natural-herbal-floor-cleaner"
+          }
+        },
+        "p7": {
+          "type": "product",
+          "settings": {
+            "product": "organic-dishwash-liquid-gel"
+          }
+        },
+        "p8": {
+          "type": "product",
+          "settings": {
+            "product": "gentle-hydrating-liquid-handwash"
+          }
+        }
+      },
+      "block_order": [
+        "p1",
+        "p2",
+        "p3",
+        "p4",
+        "p5",
+        "p6",
+        "p7",
+        "p8"
+      ]
     },
     "range": {
       "type": "purelane-range",
