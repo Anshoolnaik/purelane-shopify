@@ -8,48 +8,6 @@
         "parallax": true
       }
     },
-    "ticker": {
-      "type": "purelane-ticker",
-      "blocks": {
-        "t1": {
-          "type": "message",
-          "settings": {
-            "text": "Free shipping",
-            "emphasis": "on every bundle across India"
-          }
-        },
-        "t2": {
-          "type": "message",
-          "settings": {
-            "text": "100% plant-based",
-            "emphasis": "and non-toxic"
-          }
-        },
-        "t3": {
-          "type": "message",
-          "settings": {
-            "text": "Loved by",
-            "emphasis": "30,000+ happy homes"
-          }
-        },
-        "t4": {
-          "type": "message",
-          "settings": {
-            "text": "Buy 3",
-            "emphasis": "at flat ₹499"
-          }
-        }
-      },
-      "block_order": [
-        "t1",
-        "t2",
-        "t3",
-        "t4"
-      ],
-      "settings": {
-        "speed": 30
-      }
-    },
     "hero": {
       "type": "purelane-hero",
       "blocks": {
@@ -873,7 +831,6 @@
   },
   "order": [
     "backdrop",
-    "ticker",
     "hero",
     "reviews",
     "ingredients",

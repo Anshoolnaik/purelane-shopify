@@ -1,0 +1,30 @@
+{
+  "name": "Footer",
+  "type": "footer",
+  "sections": {
+    "footer": {
+      "type": "purelane-footer",
+      "blocks": {
+        "m1": { "type": "menu", "settings": { "title": "Shop" } },
+        "m2": { "type": "menu", "settings": { "title": "About" } },
+        "c1": {
+          "type": "text",
+          "settings": {
+            "title": "Get in touch",
+            "email": "hello@purelane.com",
+            "phone": "+91 9930 123 234",
+            "legal": "Purelane Eco Products Pvt Ltd"
+          }
+        }
+      },
+      "block_order": ["m1", "m2", "c1"],
+      "settings": {
+        "brand_name": "Purelane",
+        "tagline": "Clean, simply",
+        "blurb": "<p>Effective cleaning, powered by nature. Made for Indian homes since day one.</p>",
+        "scene": 4
+      }
+    }
+  },
+  "order": ["footer"]
+}
