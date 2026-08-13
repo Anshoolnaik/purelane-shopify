@@ -43,6 +43,21 @@ def iter_settings(schema):
             yield "block:" + block["type"], s
 
 
+def check_blank_default(setting):
+    """
+    Shopify rejects `"default": ""` outright: "setting with id=... default
+    can't be blank". A setting with no default at all is fine — the key simply
+    has to be absent rather than empty.
+
+    This cost two section files. Both carried an optional `anchor` setting with
+    an empty default, so both were refused on upload, and the JSON template
+    referencing them was refused too.
+    """
+    if "default" in setting and setting["default"] == "":
+        return ['default is an empty string — omit the "default" key entirely']
+    return []
+
+
 def check_range(setting):
     """Return a list of problems with one range setting."""
     problems = []
@@ -103,14 +118,17 @@ def main():
             continue
 
         for scope, setting in iter_settings(schema):
-            if setting.get("type") != "range":
-                continue
             checked += 1
-            for problem in check_range(setting):
+
+            for problem in check_blank_default(setting):
                 failures.append((path, scope, setting.get("id", "?"), problem))
 
+            if setting.get("type") == "range":
+                for problem in check_range(setting):
+                    failures.append((path, scope, setting.get("id", "?"), problem))
+
     print("")
-    print("  %d sections, %d range settings checked" % (len(files), checked))
+    print("  %d sections, %d settings checked" % (len(files), checked))
     print("")
 
     if not failures:
