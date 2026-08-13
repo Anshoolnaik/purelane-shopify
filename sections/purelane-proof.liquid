@@ -1,0 +1,273 @@
+{%- comment -%}
+  PURELANE — PROOF
+  "Tough on grime. Gentle on everything else." Copy on the left, a rotating
+  product on the right, a stats strip underneath.
+
+  Fixes a markup bug in the prototype: the stats strip carried
+  `grid-column: 1 / -1` but the grid container was closed one <div> too early,
+  so the strip was a sibling of the grid rather than a child and the span had
+  no effect. It looked roughly right only because a full-width block below a
+  grid lands in about the same place. Corrected here — see BUILD-NOTES.md.
+
+  The rotator is decoration: it repeats products shown elsewhere on the page,
+  so it stays hidden from assistive tech as the prototype had it. What does
+  change is reduced motion, where it becomes a static row instead of freezing
+  on the first product forever.
+{%- endcomment -%}
+
+{{ 'purelane-tokens.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-base.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-silhouettes.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-proof.css' | asset_url | stylesheet_tag }}
+
+<script src="{{ 'purelane-reveal.js' | asset_url }}" defer></script>
+<script src="{{ 'purelane-rotator.js' | asset_url }}" defer></script>
+
+{%- liquid
+  assign stats = section.blocks | where: 'type', 'stat'
+  assign rotator_products = section.blocks | where: 'type', 'rotator_product'
+-%}
+
+<div class="pl pl-sec" {% if section.settings.anchor != blank %}id="{{ section.settings.anchor | handle }}"{% endif %} data-pl-scene="{{ section.settings.scene }}">
+  <div class="pl-wrap">
+    <div class="pl-glass pl-sec-pad pl-rv">
+      <div class="pl-proof">
+
+        <div class="pl-proof__copy">
+          {%- if section.settings.kicker != blank -%}
+            <span class="pl-kicker">{{ section.settings.kicker }}</span>
+          {%- endif -%}
+
+          {%- if section.settings.heading != blank -%}
+            <h2 class="pl-d2" style="margin-top: 12px;">
+              {{- section.settings.heading | escape | newline_to_br -}}
+            </h2>
+          {%- endif -%}
+
+          {%- if section.settings.text != blank -%}
+            <div class="pl-body-s">{{ section.settings.text }}</div>
+          {%- endif -%}
+
+          {%- if section.settings.cta_label != blank and section.settings.cta_link != blank -%}
+            <a class="pl-btn pl-btn--primary" href="{{ section.settings.cta_link }}">
+              {{ section.settings.cta_label }}
+              {% render 'purelane-icon', name: 'arrow-right' %}
+            </a>
+          {%- endif -%}
+        </div>
+
+        {%- if rotator_products.size > 0 -%}
+          <div
+            class="pl-glass-2 pl-rotator"
+            data-pl-rotator
+            data-interval="{{ section.settings.rotator_interval | times: 1000 }}"
+            aria-hidden="true"
+          >
+            <div class="pl-rotator__frame" data-pl-rotator-frame>
+              {%- comment -%}
+                Each shot sits in its own slot carrying its caption as data
+                attributes, so the script never holds a parallel list that can
+                drift out of sync with the blocks.
+              {%- endcomment -%}
+              {%- for block in rotator_products -%}
+                {%- liquid
+                  assign item = block.settings.product
+                  assign caption_name = block.settings.name | default: item.title
+                  assign caption_note = block.settings.note | default: item.metafields.purelane.benefit.value
+                -%}
+                <span
+                  class="pl-rotator__slot{% if forloop.first %} is-on{% endif %}"
+                  data-pl-rotator-slot
+                  data-name="{{ caption_name | escape }}"
+                  data-note="{{ caption_note | escape }}"
+                  {{ block.shopify_attributes }}
+                >
+                  {% render 'purelane-product-media',
+                    product: item,
+                    sizes: '196px',
+                    alt: caption_name
+                  %}
+                </span>
+              {%- endfor -%}
+            </div>
+
+            <div class="pl-rotator__caption" data-pl-rotator-cap>
+              <b></b>
+              <span></span>
+            </div>
+
+            <div class="pl-rotator__dots" data-pl-rotator-dots>
+              {%- for block in rotator_products -%}
+                <i{% if forloop.first %} class="is-on"{% endif %}></i>
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- endif -%}
+
+        {%- if stats.size > 0 -%}
+          <div
+            class="pl-glass-2 pl-proof__stats"
+            style="--pl-stats-columns: {{ stats.size }};"
+          >
+            {%- for block in stats -%}
+              <div class="pl-stat" {{ block.shopify_attributes }}>
+                {%- if block.settings.value != blank -%}
+                  <div class="pl-stat__ring">{{ block.settings.value }}</div>
+                {%- endif -%}
+                {%- if block.settings.label != blank -%}
+                  <h3 class="pl-stat__label">{{ block.settings.label }}</h3>
+                {%- endif -%}
+                {%- if block.settings.note != blank -%}
+                  <p>{{ block.settings.note }}</p>
+                {%- endif -%}
+              </div>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Purelane proof",
+  "tag": "section",
+  "class": "purelane-section purelane-section--proof",
+  "settings": [
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Anchor id",
+      "info": "Lets links and the progress rail jump here, e.g. shop. Omit the #.",
+      "default": "proof"
+    },
+    {
+      "type": "text",
+      "id": "kicker",
+      "label": "Eyebrow",
+      "default": "Why it works"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Press Enter to control where the line breaks.",
+      "default": "Tough on grime.\nGentle on everything else."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Every formula is built on plant-derived cleansers and essential oils. It behaves exactly like the cleaner you are used to, minus the things you never signed up for.</p>"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button label",
+      "default": "See the ingredient list"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Rotator"
+    },
+    {
+      "type": "range",
+      "id": "rotator_interval",
+      "label": "Seconds per product",
+      "min": 1.5,
+      "max": 8,
+      "step": 0.1,
+      "unit": "s",
+      "default": 2.9
+    },
+    {
+      "type": "range",
+      "id": "scene",
+      "label": "Backdrop depth",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    }
+  ],
+  "blocks": [
+    {
+      "type": "rotator_product",
+      "name": "Rotator product",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Caption name",
+          "info": "Leave empty to use the product title."
+        },
+        {
+          "type": "text",
+          "id": "note",
+          "label": "Caption note",
+          "info": "Leave empty to use the product's purelane.benefit metafield."
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "name": "Stat",
+      "settings": [
+        {
+          "type": "text",
+          "id": "value",
+          "label": "Value",
+          "default": "99.9%"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Germ kill"
+        },
+        {
+          "type": "text",
+          "id": "note",
+          "label": "Note",
+          "default": "Tested against germs and bacteria"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Purelane proof",
+      "blocks": [
+        { "type": "rotator_product" },
+        { "type": "rotator_product" },
+        { "type": "rotator_product" },
+        { "type": "stat" },
+        {
+          "type": "stat",
+          "settings": { "value": "0%", "label": "Sulphates", "note": "No SLS, chlorine or parabens" }
+        },
+        {
+          "type": "stat",
+          "settings": { "value": "100%", "label": "Plant based", "note": "Cleansers derived from plants" }
+        },
+        {
+          "type": "stat",
+          "settings": { "value": "4.8", "label": "Rated", "note": "Across 8,000+ verified reviews" }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,193 @@
+/* ==========================================================================
+   PURELANE — BACKDROP
+   The fixed scene behind the whole page: a gradient that deepens as you
+   scroll, four caustics layers, rising bubbles and a vignette.
+
+   Structure comes from the prototype's V1 block, colour from its V2 (light)
+   overrides. Both are folded together here rather than layered, so there is
+   one declaration per property instead of two.
+   ========================================================================== */
+
+.pl-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: #eee7fb;
+}
+
+/* --------------------------------------------------------------------------
+   Scenes
+   -------------------------------------------------------------------------- */
+.pl-scene {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+}
+
+.pl-scene.is-on { opacity: 1; }
+
+.pl-scene--1 { background: linear-gradient(178deg, #fbfffb 0%, #eafaec 24%, #d6f1dc 54%, #bfe8ca 100%); }
+.pl-scene--2 { background: linear-gradient(178deg, #f6fdf7 0%, #e3f7e7 26%, #cbedd4 58%, #b2e2c2 100%); }
+.pl-scene--3 { background: linear-gradient(178deg, #f0fbf2 0%, #d9f2df 28%, #bde6c8 60%, #a2d9b6 100%); }
+.pl-scene--4 { background: linear-gradient(178deg, #e9f8ec 0%, #cdedd6 30%, #addcbe 62%, #8ecdaa 100%); }
+
+/* --------------------------------------------------------------------------
+   Water
+   -------------------------------------------------------------------------- */
+.pl-water {
+  position: absolute;
+  inset: -14% -10%;
+  pointer-events: none;
+  transition: opacity 1.2s ease;
+}
+
+.pl-wl {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+  translate: var(--pl-px, 0) var(--pl-py, 0);
+}
+
+.pl-wl .sv {
+  width: 100%;
+  height: 100%;
+}
+
+.pl-wl-a {
+  mix-blend-mode: soft-light;
+  opacity: 1;
+  animation: pl-drift-a 34s linear infinite;
+}
+
+.pl-wl-a .sv { filter: contrast(1.25); }
+
+.pl-wl-b {
+  mix-blend-mode: overlay;
+  opacity: 0.66;
+  animation: pl-drift-b 23s linear infinite;
+}
+
+.pl-wl-c {
+  mix-blend-mode: overlay;
+  opacity: 0.6;
+  animation: pl-shaft-sway 19s ease-in-out infinite;
+}
+
+.pl-wl-s {
+  mix-blend-mode: overlay;
+  opacity: 0.72;
+  animation: pl-surface 11s ease-in-out infinite;
+  transform-origin: 50% 0;
+}
+
+@keyframes pl-drift-a {
+  0% { transform: translate3d(-3%, 0, 0) scale(1.06); }
+  50% { transform: translate3d(3%, -1.6%, 0) scale(1.13); }
+  100% { transform: translate3d(-3%, 0, 0) scale(1.06); }
+}
+
+@keyframes pl-drift-b {
+  0% { transform: translate3d(4%, 1%, 0) scale(1.1); }
+  50% { transform: translate3d(-4%, -1%, 0) scale(1.04); }
+  100% { transform: translate3d(4%, 1%, 0) scale(1.1); }
+}
+
+@keyframes pl-shaft-sway {
+  0% { transform: translate3d(-2%, 0, 0) skewX(0deg); opacity: 0.34; }
+  50% { transform: translate3d(2%, 0, 0) skewX(2.4deg); opacity: 0.6; }
+  100% { transform: translate3d(-2%, 0, 0) skewX(0deg); opacity: 0.34; }
+}
+
+@keyframes pl-surface {
+  0% { transform: translateY(0) scaleY(1); opacity: 0.55; }
+  50% { transform: translateY(-1.4%) scaleY(1.14); opacity: 0.82; }
+  100% { transform: translateY(0) scaleY(1); opacity: 0.55; }
+}
+
+/* --------------------------------------------------------------------------
+   Depth response — the water thins out as the scene deepens
+   -------------------------------------------------------------------------- */
+.pl-backdrop[data-depth="1"] .pl-water { opacity: 1; }
+.pl-backdrop[data-depth="2"] .pl-water { opacity: 0.9; }
+.pl-backdrop[data-depth="3"] .pl-water { opacity: 0.76; }
+.pl-backdrop[data-depth="4"] .pl-water { opacity: 0.58; }
+
+/* The surface shimmer belongs to the shallows only. */
+.pl-backdrop[data-depth="1"] .pl-wl-s { opacity: 0.72; }
+.pl-backdrop[data-depth="2"] .pl-wl-s,
+.pl-backdrop[data-depth="3"] .pl-wl-s,
+.pl-backdrop[data-depth="4"] .pl-wl-s { opacity: 0; }
+
+/* --------------------------------------------------------------------------
+   Bubbles
+   -------------------------------------------------------------------------- */
+.pl-bubbles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.pl-bubbles span {
+  position: absolute;
+  bottom: -6%;
+  left: var(--x);
+  width: var(--s);
+  height: var(--s);
+  border-radius: 50%;
+  border: 1px solid rgba(75, 58, 143, 0.26);
+  background: radial-gradient(circle at 34% 30%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 64%);
+  animation: pl-rise var(--dur) linear infinite;
+  animation-delay: var(--dly);
+  opacity: 0;
+}
+
+@keyframes pl-rise {
+  0% { transform: translate3d(0, 0, 0); opacity: 0; }
+  12% { opacity: 0.7; }
+  88% { opacity: 0.5; }
+  100% { transform: translate3d(var(--drift), -116vh, 0); opacity: 0; }
+}
+
+/* --------------------------------------------------------------------------
+   Vignette
+   -------------------------------------------------------------------------- */
+.pl-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(126% 88% at 50% 26%, transparent 42%, rgba(75, 58, 143, 0.07) 80%, rgba(0, 80, 74, 0.16) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, transparent 20%, transparent 70%, rgba(0, 84, 78, 0.1) 100%);
+}
+
+/* --------------------------------------------------------------------------
+   Mobile — the prototype drops the heaviest layer and the bubbles here.
+   That is a deliberate performance trade, kept as-is.
+   -------------------------------------------------------------------------- */
+@media (max-width: 760px) {
+  .pl-wl-b,
+  .pl-bubbles { display: none; }
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion
+   The gradient and caustics stay; only the movement stops. Scoped to this
+   file rather than relying on the global rule, because these animations live
+   outside the .pl wrapper.
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .pl-wl-a,
+  .pl-wl-b,
+  .pl-wl-c,
+  .pl-wl-s,
+  .pl-bubbles span {
+    animation: none;
+  }
+
+  .pl-wl { translate: none; }
+
+  .pl-scene { transition: none; }
+}

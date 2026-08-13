@@ -1,0 +1,165 @@
+{%- comment -%}
+  PURELANE — SIGNUP
+  The Purelane Club email capture.
+
+  The prototype's form was `onsubmit="return false"` — it looked like a form
+  and did nothing. This is a real Shopify customer form, so submissions land
+  in Customers tagged `newsletter` and can be picked up by whatever email tool
+  the merchant uses. It works without JavaScript, and it has the success and
+  error states the prototype had no way to express.
+{%- endcomment -%}
+
+{{ 'purelane-tokens.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-base.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-signup.css' | asset_url | stylesheet_tag }}
+
+<script src="{{ 'purelane-reveal.js' | asset_url }}" defer></script>
+
+<div class="pl pl-sec" {% if section.settings.anchor != blank %}id="{{ section.settings.anchor | handle }}"{% endif %} data-pl-scene="{{ section.settings.scene }}">
+  <div class="pl-wrap">
+    <div class="pl-glass pl-signup pl-rv">
+
+      {%- if section.settings.kicker != blank -%}
+        <span class="pl-kicker">{{ section.settings.kicker }}</span>
+      {%- endif -%}
+
+      {%- if section.settings.heading != blank -%}
+        <h2 class="pl-d2" style="margin-top: 12px;">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.text != blank -%}
+        <div class="pl-lede">{{ section.settings.text }}</div>
+      {%- endif -%}
+
+      {%- comment -%}
+        The id is built into a variable first. A filter expression passed
+        directly as a tag parameter — `id: 'x-' | append: section.id` — parses
+        locally but is not reliably accepted by Shopify's form tag, and a file
+        that fails to parse is rejected on upload without an error message.
+      {%- endcomment -%}
+      {%- assign signup_form_id = 'purelane-signup-' | append: section.id -%}
+
+      {%- form 'customer', class: 'pl-signup__form', id: signup_form_id -%}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+
+        {%- comment -%}
+          A placeholder is not a label. The prototype relied on the placeholder
+          alone, which disappears as soon as the field has content and is not
+          reliably announced. A visually hidden <label> is attached instead.
+        {%- endcomment -%}
+        <label class="pl-visually-hidden" for="purelane-signup-email-{{ section.id }}">
+          {{ section.settings.field_label }}
+        </label>
+
+        <input
+          id="purelane-signup-email-{{ section.id }}"
+          class="pl-signup__field"
+          type="email"
+          name="contact[email]"
+          value="{{ form.email }}"
+          placeholder="{{ section.settings.field_placeholder | escape }}"
+          autocomplete="email"
+          required
+          {% if form.errors %}
+            aria-invalid="true"
+            aria-describedby="purelane-signup-error-{{ section.id }}"
+          {% endif %}
+        >
+
+        <button type="submit" class="pl-btn pl-btn--primary">
+          {{ section.settings.button_label }}
+        </button>
+
+        {%- if form.posted_successfully? -%}
+          <p class="pl-signup__message pl-signup__message--success" role="status">
+            {{ section.settings.success_message }}
+          </p>
+        {%- elsif form.errors -%}
+          <p
+            id="purelane-signup-error-{{ section.id }}"
+            class="pl-signup__message pl-signup__message--error"
+            role="alert"
+          >
+            {{ form.errors.translated_fields.email | capitalize }}
+            {{ form.errors.messages.email }}
+          </p>
+        {%- endif -%}
+      {%- endform -%}
+
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Purelane signup",
+  "tag": "section",
+  "class": "purelane-section purelane-section--signup",
+  "settings": [
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Anchor id",
+      "info": "Lets links and the progress rail jump here, e.g. shop. Omit the #.",
+      "default": ""
+    },
+    {
+      "type": "text",
+      "id": "kicker",
+      "label": "Eyebrow",
+      "default": "Join the Purelane Club"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Get ₹100 off your first bundle"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Plus first access to new launches and restocks.</p>"
+    },
+    {
+      "type": "text",
+      "id": "field_label",
+      "label": "Field label",
+      "info": "Read by screen readers. Not shown on screen.",
+      "default": "Email address"
+    },
+    {
+      "type": "text",
+      "id": "field_placeholder",
+      "label": "Field placeholder",
+      "default": "your@email.com"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Get my ₹100 off"
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Success message",
+      "default": "You're in. Check your inbox for the code."
+    },
+    {
+      "type": "range",
+      "id": "scene",
+      "label": "Backdrop depth",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 4
+    }
+  ],
+  "presets": [
+    {
+      "name": "Purelane signup"
+    }
+  ]
+}
+{% endschema %}

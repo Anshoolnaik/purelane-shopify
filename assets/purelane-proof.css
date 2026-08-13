@@ -1,0 +1,187 @@
+/* ==========================================================================
+   PURELANE — PROOF
+   A two-column panel: copy on the left, a rotating product on the right, and
+   a stats strip spanning both.
+   ========================================================================== */
+
+.pl-proof {
+  display: grid;
+  gap: 22px;
+  grid-template-columns: 1fr;
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  .pl-proof {
+    grid-template-columns: 1.05fr 0.62fr;
+    gap: 30px;
+  }
+}
+
+.pl-proof__copy .pl-d2 { margin-bottom: 14px; }
+.pl-proof__copy .pl-btn { margin-top: 22px; }
+.pl-proof__copy .pl-body-s { max-width: 40ch; }
+
+/* The prototype gave this `grid-column: 1 / -1` but closed the grid container
+   one <div> too early, so the strip was never a grid child and the span did
+   nothing. It sits inside the grid here, where the declaration works. */
+.pl-proof__stats {
+  grid-column: 1 / -1;
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  padding: 22px 18px;
+}
+
+@media (min-width: 640px) {
+  .pl-proof__stats { grid-template-columns: repeat(var(--pl-stats-columns, 4), 1fr); }
+}
+
+.pl-stat { text-align: center; }
+
+.pl-stat__ring {
+  width: 74px;
+  height: 74px;
+  margin: 0 auto 11px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--pl-line-strong);
+  background: radial-gradient(circle at 34% 26%, rgba(255, 255, 255, 0.86), rgba(236, 230, 247, 0.52));
+  font-family: var(--pl-font-display);
+  font-weight: 800;
+  font-size: 19px;
+  color: var(--pl-surface);
+  letter-spacing: -0.02em;
+}
+
+.pl-stat__label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--pl-accent);
+  margin-bottom: 5px;
+}
+
+.pl-stat p {
+  font-size: 11.4px;
+  color: var(--pl-paper-2);
+  line-height: 1.44;
+}
+
+/* --------------------------------------------------------------------------
+   Rotator
+   -------------------------------------------------------------------------- */
+.pl-rotator {
+  position: relative;
+  padding: 18px 12px 16px;
+  border-radius: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.pl-rotator__frame {
+  position: relative;
+  width: 100%;
+  height: 206px;
+}
+
+.pl-rotator__slot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: block;
+  opacity: 0;
+  transform: translate(-50%, -42%) scale(0.94);
+  transition:
+    opacity 0.75s var(--pl-ease),
+    transform 0.75s var(--pl-ease);
+  filter: var(--pl-shadow-prod-md);
+}
+
+.pl-rotator__slot.is-on {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.pl-rotator__slot .pl-pimg { height: 196px; }
+
+.pl-rotator__caption {
+  margin-top: 12px;
+  text-align: center;
+  min-height: 32px;
+}
+
+.pl-rotator__caption b {
+  display: block;
+  font-family: var(--pl-font-display);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--pl-surface);
+}
+
+.pl-rotator__caption span {
+  display: block;
+  font-size: 11px;
+  color: var(--pl-paper-3);
+  margin-top: 3px;
+}
+
+.pl-rotator__dots {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.pl-rotator__dots i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(75, 58, 143, 0.22);
+  transition: 0.4s var(--pl-ease);
+}
+
+.pl-rotator__dots i.is-on {
+  background: var(--pl-accent);
+  width: 17px;
+  border-radius: 999px;
+}
+
+@media (max-width: 760px) {
+  .pl-rotator__frame { height: 172px; }
+  .pl-rotator__frame .pl-pimg { height: 164px; }
+  .pl-stat__ring {
+    width: 64px;
+    height: 64px;
+    font-size: 16.5px;
+  }
+}
+
+/* With motion off the rotator never advances, so only the first product would
+   ever be seen. They stack into a static row instead. */
+@media (prefers-reduced-motion: reduce) {
+  .pl-rotator__frame {
+    height: auto;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .pl-rotator__frame .pl-pimg {
+    position: static;
+    transform: none;
+    opacity: 1;
+    height: 96px;
+  }
+
+  .pl-rotator__dots { display: none; }
+}

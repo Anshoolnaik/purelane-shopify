@@ -1,0 +1,300 @@
+/* ==========================================================================
+   PURELANE — CHROME
+   Fixed page furniture: the floating header pill, the scroll progress rail
+   and the sticky mobile CTA.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Header
+   -------------------------------------------------------------------------- */
+.pl-header {
+  position: fixed;
+  top: var(--pl-header-top, 38px);
+  left: 0;
+  right: 0;
+  z-index: 50;
+  padding: 0 14px;
+  transition: top 0.4s var(--pl-ease);
+}
+
+.pl-header.is-up { top: 10px; }
+
+.pl-header__pill {
+  max-width: var(--pl-maxw);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 10px 14px;
+  border-radius: 999px;
+}
+
+.pl-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  flex: 0 0 auto;
+}
+
+.pl-brand__mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  background: linear-gradient(150deg, rgba(201, 118, 29, 0.2), rgba(75, 58, 143, 0.14));
+  border: 1px solid var(--pl-line-mid);
+  color: var(--pl-accent);
+}
+
+.pl-brand__mark svg {
+  width: 23px;
+  height: 23px;
+}
+
+.pl-brand__mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+.pl-brand__text { line-height: 1.05; }
+
+.pl-brand__name {
+  display: block;
+  font-family: var(--pl-font-display);
+  font-weight: 800;
+  font-size: 16.5px;
+  line-height: 1.06;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--pl-surface);
+}
+
+.pl-brand__tagline {
+  display: block;
+  font-size: 8.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--pl-paper-3);
+}
+
+.pl-nav {
+  display: none;
+  gap: 26px;
+  margin: 0 auto;
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+.pl-nav a {
+  color: var(--pl-paper-2);
+  padding: 6px 0;
+  position: relative;
+  transition: 0.3s;
+}
+
+.pl-nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 100%;
+  bottom: 0;
+  height: 1.5px;
+  background: var(--pl-accent);
+  transition: right 0.35s var(--pl-ease);
+}
+
+.pl-nav a:hover { color: var(--pl-surface); }
+.pl-nav a:hover::after { right: 0; }
+
+/* Current page marker. The prototype had no notion of one. */
+.pl-nav a[aria-current="page"] { color: var(--pl-surface); }
+.pl-nav a[aria-current="page"]::after { right: 0; }
+
+.pl-header__tools {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.pl-icobtn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--pl-paper-2);
+  transition: 0.3s;
+  position: relative;
+}
+
+.pl-icobtn:hover {
+  background: rgba(75, 58, 143, 0.09);
+  color: var(--pl-surface);
+}
+
+.pl-icobtn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.pl-icobtn__count {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--pl-brand);
+  color: var(--pl-on-teal);
+  font-size: 9.5px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  padding: 0 4px;
+}
+
+@media (max-width: 600px) {
+  .pl-icobtn--optional { display: none; }
+  .pl-brand__mark { width: 34px; height: 34px; }
+  .pl-brand__name { font-size: 14.5px; }
+  .pl-brand__tagline { font-size: 7.6px; letter-spacing: 0.2em; }
+  .pl-header__pill { gap: 10px; padding: 8px 10px; }
+}
+
+@media (min-width: 1024px) {
+  .pl-nav { display: flex; }
+  .pl-header__burger { display: none; }
+}
+
+/* --------------------------------------------------------------------------
+   Mobile menu
+   The prototype's burger button was inert — there was no menu behind it. This
+   is a real disclosure panel.
+   -------------------------------------------------------------------------- */
+.pl-menu {
+  max-width: var(--pl-maxw);
+  margin: 8px auto 0;
+  padding: 14px 18px;
+  border-radius: var(--pl-r);
+  display: grid;
+  gap: 4px;
+}
+
+.pl-menu[hidden] { display: none; }
+
+.pl-menu a {
+  padding: 10px 4px;
+  font-size: 15px;
+  color: var(--pl-paper-2);
+  border-bottom: 1px solid var(--pl-line-soft);
+}
+
+.pl-menu a:last-child { border-bottom: 0; }
+
+@media (min-width: 1024px) {
+  .pl-menu { display: none; }
+}
+
+/* --------------------------------------------------------------------------
+   Progress rail
+   -------------------------------------------------------------------------- */
+.pl-rail {
+  position: fixed;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 44;
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 1180px) {
+  .pl-rail { display: flex; }
+}
+
+.pl-rail a {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(75, 58, 143, 0.24);
+  transition: 0.3s var(--pl-ease);
+  position: relative;
+}
+
+.pl-rail a.is-on {
+  background: var(--pl-accent);
+  box-shadow: 0 0 0 5px rgba(201, 118, 29, 0.16);
+  height: 22px;
+  border-radius: 999px;
+}
+
+/* 8px dots are far below the minimum target size; the hit area is enlarged
+   without changing the mark. */
+.pl-rail a::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 32px;
+  height: 32px;
+}
+
+/* --------------------------------------------------------------------------
+   Sticky CTA
+   -------------------------------------------------------------------------- */
+.pl-sticky {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 48;
+  padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--pl-line-mid);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pl-sticky__label { line-height: 1.2; }
+
+.pl-sticky__label b {
+  display: block;
+  font-family: var(--pl-font-display);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--pl-surface);
+}
+
+.pl-sticky__label span {
+  font-size: 10.5px;
+  color: var(--pl-paper-3);
+}
+
+.pl-sticky .pl-btn { margin-left: auto; }
+
+@media (min-width: 960px) {
+  .pl-sticky { display: none; }
+}
+
+/* The bar overlays the end of the page. The prototype reserved room for it
+   with `body { padding-bottom: 74px }`, which cannot be done from a section —
+   the spacer element does the same job without touching the theme's body. */
+.pl-sticky-spacer { height: 74px; }
+
+@media (min-width: 960px) {
+  .pl-sticky-spacer { display: none; }
+}

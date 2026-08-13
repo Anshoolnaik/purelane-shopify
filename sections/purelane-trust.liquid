@@ -1,0 +1,107 @@
+{%- comment -%}
+  PURELANE — TRUST BAR
+  A compact row of brand promises. Each promise is a block so the row can grow
+  or shrink without a code change.
+{%- endcomment -%}
+
+{{ 'purelane-tokens.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-base.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-icon-grid.css' | asset_url | stylesheet_tag }}
+
+<script src="{{ 'purelane-reveal.js' | asset_url }}" defer></script>
+
+{%- if section.blocks.size > 0 -%}
+  <div class="pl pl-sec" {% if section.settings.anchor != blank %}id="{{ section.settings.anchor | handle }}"{% endif %} data-pl-scene="{{ section.settings.scene }}">
+    <div class="pl-wrap">
+      <div
+        class="pl-glass pl-trust pl-rv"
+        style="--pl-trust-columns: {{ section.settings.columns }};"
+      >
+        {%- for block in section.blocks -%}
+          <div class="pl-trust__item" {{ block.shopify_attributes }}>
+            {% render 'purelane-icon', name: block.settings.icon %}
+            <span>{{ block.settings.label | escape | newline_to_br }}</span>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Purelane trust bar",
+  "tag": "section",
+  "class": "purelane-section purelane-section--trust",
+  "settings": [
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Anchor id",
+      "info": "Lets links and the progress rail jump here, e.g. shop. Omit the #.",
+      "default": ""
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Columns on desktop",
+      "info": "Mobile is always two columns.",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "scene",
+      "label": "Backdrop depth",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 4
+    }
+  ],
+  "blocks": [
+    {
+      "type": "promise",
+      "name": "Promise",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "leaf", "label": "Leaf" },
+            { "value": "box", "label": "Packaging" },
+            { "value": "heart", "label": "Heart" },
+            { "value": "globe", "label": "Globe" },
+            { "value": "shield-check", "label": "Shield" },
+            { "value": "truck", "label": "Shipping" },
+            { "value": "no-chem", "label": "No chemicals" },
+            { "value": "star", "label": "Star" }
+          ],
+          "default": "leaf"
+        },
+        {
+          "type": "textarea",
+          "id": "label",
+          "label": "Label",
+          "info": "Press Enter to control where the line breaks.",
+          "default": "Plant derived\nformulas"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Purelane trust bar",
+      "blocks": [
+        { "type": "promise", "settings": { "icon": "leaf", "label": "Plant derived\nformulas" } },
+        { "type": "promise", "settings": { "icon": "box", "label": "Recyclable\npackaging" } },
+        { "type": "promise", "settings": { "icon": "heart", "label": "Safe for\nkids & pets" } },
+        { "type": "promise", "settings": { "icon": "globe", "label": "Made in\nIndia" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

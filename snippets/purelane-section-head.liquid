@@ -1,0 +1,70 @@
+{%- comment -%}
+  PURELANE — SECTION HEADING
+  ---------------------------------------------------------------------------
+  The centred kicker / heading / leaf-rule / lede block, used by six sections
+  in the prototype with the spacing re-declared inline each time
+  (style="margin-top:12px", style="margin:14px auto 0"). Defined once here;
+  the spacing lives in CSS.
+
+  Every part is optional, so a merchant can clear the kicker or the lede in the
+  theme editor and the block still composes correctly.
+
+  The heading level is a parameter, not fixed at <h2>. A section may be placed
+  anywhere on the page, and hardcoding the level is how heading order breaks.
+
+  Accepts:
+    kicker         string  optional eyebrow text
+    heading        string  optional heading text (may contain merchant HTML)
+    heading_level  string  optional, 'h1'|'h2'|'h3'. Defaults to 'h2'
+    heading_size   string  optional, a pl-d* class. Defaults to 'pl-d2'
+    lede           string  optional supporting paragraph
+    show_rule      bool    optional, defaults to true
+    class          string  optional extra classes
+
+  Usage:
+    {% render 'purelane-section-head',
+       kicker: section.settings.kicker,
+       heading: section.settings.heading,
+       lede: section.settings.lede %}
+{%- endcomment -%}
+
+{%- liquid
+  assign level = heading_level | default: 'h2'
+  assign size_class = heading_size | default: 'pl-d2'
+  assign with_rule = true
+  if show_rule == false
+    assign with_rule = false
+  endif
+-%}
+
+{%- if kicker != blank or heading != blank or lede != blank -%}
+  <div class="pl-panel-head pl-rv {{ class }}">
+    {%- if kicker != blank -%}
+      <span class="pl-kicker">{{ kicker }}</span>
+    {%- endif -%}
+
+    {%- if heading != blank -%}
+      {%- case level -%}
+        {%- when 'h1' -%}
+          <h1 class="{{ size_class }} pl-panel-head__title">{{ heading }}</h1>
+        {%- when 'h3' -%}
+          <h3 class="{{ size_class }} pl-panel-head__title">{{ heading }}</h3>
+        {%- else -%}
+          <h2 class="{{ size_class }} pl-panel-head__title">{{ heading }}</h2>
+      {%- endcase -%}
+    {%- endif -%}
+
+    {%- if with_rule -%}
+      {%- comment -%} Decorative divider: no semantics, hidden from AT. {%- endcomment -%}
+      <div class="pl-rule" aria-hidden="true">
+        <i></i>
+        {% render 'purelane-icon', name: 'leaf' %}
+        <i></i>
+      </div>
+    {%- endif -%}
+
+    {%- if lede != blank -%}
+      <p class="pl-lede pl-panel-head__lede">{{ lede }}</p>
+    {%- endif -%}
+  </div>
+{%- endif -%}

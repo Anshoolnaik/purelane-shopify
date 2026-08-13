@@ -1,0 +1,104 @@
+{%- comment -%}
+  PURELANE — TICKER
+  ---------------------------------------------------------------------------
+  The scrolling promise strip.
+
+  The prototype listed four messages twice in the source to make the loop
+  seamless, and put aria-hidden on the whole strip. Hiding it entirely was the
+  wrong call — "Free shipping on every bundle" and "Buy 3 at flat ₹499" are
+  real offers, not decoration. Here the first pass is announced normally and
+  only the duplicate pass is hidden.
+{%- endcomment -%}
+
+{{ 'purelane-tokens.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-base.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-ticker.css' | asset_url | stylesheet_tag }}
+
+{%- if section.blocks.size > 0 -%}
+  <div class="pl pl-ticker">
+    <div
+      class="pl-ticker__track"
+      style="--pl-ticker-duration: {{ section.settings.speed }}s;"
+    >
+      {%- for pass in (1..2) -%}
+        {%- for block in section.blocks -%}
+          <span
+            {% if pass == 2 %}
+              aria-hidden="true"
+              data-pl-ticker-clone
+            {% else %}
+              {{ block.shopify_attributes }}
+            {% endif %}
+          >
+            {{- block.settings.text -}}
+            {%- if block.settings.emphasis != blank %} <b>{{ block.settings.emphasis }}</b>{% endif -%}
+          </span>
+        {%- endfor -%}
+      {%- endfor -%}
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Purelane ticker",
+  "tag": "section",
+  "class": "purelane-section purelane-section--ticker",
+  "settings": [
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "Seconds per loop",
+      "info": "Higher is slower.",
+      "min": 10,
+      "max": 90,
+      "step": 2,
+      "default": 30
+    }
+  ],
+  "blocks": [
+    {
+      "type": "message",
+      "name": "Message",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Free shipping"
+        },
+        {
+          "type": "text",
+          "id": "emphasis",
+          "label": "Emphasised text",
+          "info": "Shown in the accent colour after the text above.",
+          "default": "on every bundle across India"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Purelane ticker",
+      "blocks": [
+        {
+          "type": "message",
+          "settings": { "text": "Free shipping", "emphasis": "on every bundle across India" }
+        },
+        {
+          "type": "message",
+          "settings": { "text": "100% plant-based", "emphasis": "and non-toxic" }
+        },
+        {
+          "type": "message",
+          "settings": { "text": "Loved by", "emphasis": "30,000+ happy homes" }
+        },
+        {
+          "type": "message",
+          "settings": { "text": "Buy 3", "emphasis": "at flat ₹499" }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

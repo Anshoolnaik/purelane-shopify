@@ -1,0 +1,84 @@
+{%- comment -%}
+  PURELANE — PRICE
+  ---------------------------------------------------------------------------
+  The prototype hardcoded every price: ₹200 / ₹299 / "33% off" was literal
+  markup repeated on each card, identical across four different products.
+  This reads the real price, the real compare-at price, and derives the saving.
+
+  Money is rendered through the `money` filter, so the currency format follows
+  the store's own settings rather than a baked-in ₹.
+
+  Handles the states the prototype had no way to express:
+    - no compare-at price   → no strikethrough, no saving badge
+    - price varies by variant → "From <price>"
+    - sold out              → caller decides; see purelane-product-card
+
+  Accepts:
+    product   object   required
+    variant   object   optional. Prices this variant instead of the product
+    saving     string  optional. 'percent' (default) or 'amount'
+    class      string  optional. Extra classes on the wrapper
+    from_label string  optional. Prefix when the price varies. Defaults to 'From'
+
+  Usage:
+    {% render 'purelane-price', product: card_product %}
+    {% render 'purelane-price', product: combo_product, saving: 'amount' %}
+{%- endcomment -%}
+
+{%- liquid
+  if variant != blank
+    assign price = variant.price
+    assign compare_at = variant.compare_at_price
+    assign varies = false
+  else
+    assign price = product.price
+    assign compare_at = product.compare_at_price
+    assign varies = product.price_varies
+  endif
+
+  assign saving_style = saving | default: 'percent'
+  assign has_saving = false
+
+  if compare_at > price
+    assign has_saving = true
+    assign saved_amount = compare_at | minus: price
+    assign saved_percent = saved_amount | times: 100.0 | divided_by: compare_at | round
+  endif
+-%}
+
+<div class="pl-price {{ class }}">
+  {%- comment -%}
+    The money value is formatted first and only then placed into the sentence.
+    Chaining `| money` after an `append` or a `t:` applies it to the resulting
+    string rather than the number, which renders as nothing at all — no error,
+    just an empty price.
+  {%- endcomment -%}
+  {%- assign price_money = price | money -%}
+
+  <strong class="pl-price__now">
+    {%- if varies -%}
+      {{ from_label | default: 'From' }} {{ price_money }}
+    {%- else -%}
+      {{- price_money -}}
+    {%- endif -%}
+  </strong>
+
+  {%- if has_saving -%}
+    {%- comment -%}
+      The compare-at price is announced to screen readers with its own label,
+      because a bare <s> is read as a second, contradictory price.
+    {%- endcomment -%}
+    <s class="pl-price__was">
+      <span class="pl-visually-hidden">Regular price </span>
+      {{- compare_at | money -}}
+    </s>
+
+    <em class="pl-price__save">
+      {%- if saving_style == 'amount' -%}
+        Save {{ saved_amount | money }}
+      {%- else -%}
+        {{ saved_percent }}% off
+      {%- endif -%}
+    </em>
+  {%- endif -%}
+</div>

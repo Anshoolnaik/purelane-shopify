@@ -1,0 +1,82 @@
+{%- comment -%}
+  PURELANE — PROGRESS RAIL
+  The column of dots on the right that tracks which section you are in.
+
+  Shown from 1180px only, matching the prototype.
+
+  The prototype's rail linked to `#voices`, an id that does not exist anywhere
+  in the document — clicking that dot did nothing. Targets are blocks here, so
+  a merchant sets each one and a broken link is visible in the editor rather
+  than silently dead on the page.
+{%- endcomment -%}
+
+{{ 'purelane-tokens.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-base.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-chrome.css' | asset_url | stylesheet_tag }}
+
+<script src="{{ 'purelane-chrome.js' | asset_url }}" defer></script>
+
+{%- if section.blocks.size > 0 -%}
+  <nav
+    class="pl pl-rail"
+    data-pl-rail
+    aria-label="{{ section.settings.label | default: 'Section progress' | escape }}"
+  >
+    {%- for block in section.blocks -%}
+      <a
+        href="{{ block.settings.target }}"
+        class="{% if forloop.first %}is-on{% endif %}"
+        {{ block.shopify_attributes }}
+      >
+        <span class="pl-visually-hidden">{{ block.settings.label }}</span>
+      </a>
+    {%- endfor -%}
+  </nav>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Purelane progress rail",
+  "tag": "div",
+  "class": "purelane-rail-host",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Only visible on screens wider than 1180px. Each dot needs an anchor target such as #shop."
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Accessible label",
+      "default": "Section progress"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "target",
+      "name": "Target",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "info": "Read by screen readers.",
+          "default": "Hero"
+        },
+        {
+          "type": "text",
+          "id": "target",
+          "label": "Anchor",
+          "info": "The id of the section to scroll to, including the #.",
+          "default": "#top"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Purelane progress rail"
+    }
+  ]
+}
+{% endschema %}

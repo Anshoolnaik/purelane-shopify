@@ -1,0 +1,92 @@
+{%- comment -%}
+  PURELANE — RATING
+  ---------------------------------------------------------------------------
+  The prototype hardcoded "★ 4.8 · 237 reviews" on every card and a literal
+  ★★★★★ string in every review. This reads the real values.
+
+  Ratings come from Shopify's native `rating` metafield type, which is what
+  review apps (Judge.me, Loox, Okendo, Shopify Product Reviews) write into. So
+  installing a review app later populates these with no template change.
+
+  If a product has no rating the snippet renders nothing at all, rather than a
+  fake or zeroed score — the seeded catalogue includes an unrated product to
+  prove the layout holds without it.
+
+  The star row is drawn as text but hidden from assistive tech, with the real
+  score exposed as a single readable string. Five separate ★ characters are
+  announced as "black star black star black star…" otherwise.
+
+  Accepts:
+    rating       object   optional. A `rating` metafield value
+    rating_count number   optional. Review count
+    product      object   optional. Used to look both up automatically
+    style        string   'inline' (default) — "★ 4.8 · 237 reviews"
+                          'stars'            — a ★★★★★ row only
+    class        string   optional
+
+  Usage:
+    {% render 'purelane-rating', product: card_product %}
+    {% render 'purelane-rating', rating: block.settings.rating, style: 'stars' %}
+{%- endcomment -%}
+
+{%- liquid
+  assign display = style | default: 'inline'
+
+  if rating != blank
+    assign rating_value = rating
+  else
+    assign rating_value = product.metafields.purelane.rating.value
+  endif
+
+  if rating_count != blank
+    assign review_count = rating_count
+  else
+    assign review_count = product.metafields.purelane.rating_count.value
+  endif
+
+  assign score = rating_value.rating | default: rating_value
+  assign scale_max = rating_value.scale_max | default: 5
+-%}
+
+{%- if score != blank and score > 0 -%}
+
+  {%- liquid
+    assign filled = score | round
+    if filled > scale_max
+      assign filled = scale_max
+    endif
+    comment
+      Not named `empty`: that is a Liquid keyword literal, used in comparisons
+      like `value == empty`. Assigning to it shadows the language's own token.
+    endcomment
+    assign hollow = scale_max | minus: filled
+  -%}
+
+  {%- if display == 'stars' -%}
+
+    <div class="pl-stars {{ class }}">
+      <span aria-hidden="true">
+        {%- for i in (1..filled) -%}★{%- endfor -%}
+        {%- if hollow > 0 -%}
+          {%- for i in (1..hollow) -%}☆{%- endfor -%}
+        {%- endif -%}
+      </span>
+      <span class="pl-visually-hidden">
+        {{- score }} out of {{ scale_max }} stars
+      </span>
+    </div>
+
+  {%- else -%}
+
+    <div class="pl-rate {{ class }}">
+      <b aria-hidden="true">★ {{ score }}</b>
+      <span class="pl-visually-hidden">Rated {{ score }} out of {{ scale_max }}</span>
+      {%- if review_count != blank and review_count > 0 -%}
+        <span aria-hidden="true">·</span>
+        <span>{{ review_count }} {% if review_count == 1 %}review{% else %}reviews{% endif %}</span>
+      {%- endif -%}
+    </div>
+
+  {%- endif -%}
+
+{%- endif -%}

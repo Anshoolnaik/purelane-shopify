@@ -1,0 +1,381 @@
+/* ==========================================================================
+   PURELANE — HERO
+   Geometry reproduced from the prototype's `.hero` block, with the V2 (light)
+   colour overrides folded in rather than layered on top.
+   ========================================================================== */
+
+.pl-hero {
+  position: relative;
+  z-index: 2;
+  min-height: var(--pl-hero-min-height, 100svh);
+  display: flex;
+  align-items: flex-end;
+  padding-top: var(--pl-hero-pad-top, 150px);
+  padding-bottom: var(--pl-sec-y);
+}
+
+/* Scrim that lifts the copy off the backdrop. Left-to-right on wide screens,
+   top-to-bottom once the product stacks under the copy. */
+.pl-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    102deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0.5) 30%,
+    rgba(255, 255, 255, 0.12) 54%,
+    transparent 68%
+  );
+}
+
+.pl-hero__grid {
+  max-width: var(--pl-maxw);
+  margin: 0 auto;
+  padding: 0 var(--pl-gutter);
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.pl-hero__copy {
+  max-width: 600px;
+  position: relative;
+  z-index: 3;
+}
+
+.pl-hero__title { margin-bottom: 20px; }
+
+.pl-hero__cta {
+  display: flex;
+  gap: 11px;
+  flex-wrap: wrap;
+  margin-top: 26px;
+}
+
+/* --------------------------------------------------------------------------
+   Vertical badge rail (wide screens)
+   -------------------------------------------------------------------------- */
+.pl-hero__badges {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 96px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 8px;
+  border-radius: 20px;
+}
+
+.pl-hero__badge {
+  text-align: center;
+  padding: 11px 4px;
+}
+
+.pl-hero__badge + .pl-hero__badge { border-top: 1px solid var(--pl-line); }
+
+.pl-hero__badge-icon {
+  width: 38px;
+  height: 38px;
+  margin: 0 auto 8px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid var(--pl-g-line);
+  color: var(--pl-leaf);
+}
+
+.pl-hero__badge-icon svg {
+  width: 19px;
+  height: 19px;
+}
+
+.pl-hero__badge span {
+  display: block;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--pl-paper-2);
+  line-height: 1.34;
+}
+
+/* --------------------------------------------------------------------------
+   Horizontal badge strip (narrow screens)
+   -------------------------------------------------------------------------- */
+.pl-hero__strip {
+  display: flex;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.pl-hero__strip > div {
+  flex: 1;
+  text-align: center;
+  padding: 11px 6px;
+  border-radius: 14px;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pl-paper-2);
+  line-height: 1.3;
+}
+
+.pl-hero__strip svg {
+  width: 18px;
+  height: 18px;
+  margin: 0 auto 6px;
+  color: var(--pl-leaf);
+}
+
+/* --------------------------------------------------------------------------
+   Product stage
+   -------------------------------------------------------------------------- */
+.pl-hero__prod {
+  position: absolute;
+  right: 2%;
+  bottom: 28px;
+  width: min(50vw, 560px);
+  z-index: 2;
+}
+
+.pl-hero__stage {
+  position: relative;
+  width: 100%;
+  height: clamp(380px, 74svh, 680px);
+}
+
+.pl-hero__slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding-right: 2%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.85s var(--pl-ease);
+}
+
+.pl-hero__slide.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.pl-hero__shot {
+  position: relative;
+  width: auto;
+  flex: 0 0 auto;
+  opacity: 0;
+  transform: translateY(28px) scale(0.94);
+  transition:
+    opacity 0.8s var(--pl-ease),
+    transform 0.8s var(--pl-ease);
+  filter: var(--pl-shadow-prod-lg);
+}
+
+.pl-hero__slide.is-active .pl-hero__shot {
+  opacity: 1;
+  transform: none;
+}
+
+/* Staggered entrance. The prototype reused its display-type classes .d1/.d2/.d3
+   as stagger hooks here, which collided with the type scale — an empty span was
+   inheriting a 112px font size. Renamed to describe the job they actually do. */
+.pl-hero__slide.is-active .pl-hero__shot--s1 { transition-delay: 0.06s; }
+.pl-hero__slide.is-active .pl-hero__shot--s2 { transition-delay: 0.3s; }
+.pl-hero__slide.is-active .pl-hero__shot--s3 { transition-delay: 0.54s; }
+
+/* Per-count composition. One product fills the stage; two and three overlap
+   into a tight group with the tallest bottle in front. */
+.pl-hero__slide--x1 .pl-hero__shot--a { height: 100%; z-index: 3; }
+
+.pl-hero__slide--x2 .pl-hero__shot--a { height: 80%; margin-right: -8%; z-index: 1; }
+.pl-hero__slide--x2 .pl-hero__shot--b { height: 97%; z-index: 3; }
+
+.pl-hero__slide--x3 .pl-hero__shot--a { height: 75%; margin-right: -8%; z-index: 1; order: 1; }
+.pl-hero__slide--x3 .pl-hero__shot--c { height: 97%; z-index: 3; order: 2; }
+.pl-hero__slide--x3 .pl-hero__shot--b { height: 79%; margin-left: -8%; z-index: 2; order: 3; }
+
+/* --------------------------------------------------------------------------
+   Price flag
+   -------------------------------------------------------------------------- */
+.pl-hero__tag {
+  position: absolute;
+  left: 0;
+  bottom: 2%;
+  z-index: 6;
+  padding: 11px 14px 12px;
+  border-radius: 16px;
+  max-width: 52%;
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.8s var(--pl-ease) 0.62s,
+    transform 0.8s var(--pl-ease) 0.62s;
+}
+
+.pl-hero__slide.is-active .pl-hero__tag {
+  opacity: 1;
+  transform: none;
+}
+
+.pl-hero__tag-label {
+  display: block;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  color: var(--pl-accent);
+}
+
+.pl-hero__tag .pl-price {
+  align-items: baseline;
+  gap: 7px;
+  margin-top: 5px;
+}
+
+.pl-hero__tag .pl-price__now {
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.pl-hero__tag .pl-price__was { font-size: 12px; }
+
+.pl-hero__tag .pl-price__save {
+  display: inline-block;
+  margin-top: 7px;
+  font-size: 8.4px;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(201, 118, 29, 0.16);
+  border: 1px solid rgba(201, 118, 29, 0.36);
+  color: var(--pl-leaf);
+}
+
+/* --------------------------------------------------------------------------
+   Stage controls
+   -------------------------------------------------------------------------- */
+.pl-hero__dots {
+  display: flex;
+  gap: 7px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.pl-hero__dots button {
+  width: 6px;
+  height: 6px;
+  padding: 0;
+  border-radius: 50%;
+  background: rgba(75, 58, 143, 0.22);
+  transition: 0.4s var(--pl-ease);
+}
+
+.pl-hero__dots button[aria-current="true"] {
+  background: var(--pl-accent);
+  width: 20px;
+  border-radius: 999px;
+}
+
+.pl-hero__dots button:hover { background: rgba(75, 58, 143, 0.4); }
+
+/* The dots are 6px tall, far under the 24px minimum touch target. A
+   transparent pseudo-element enlarges the hit area without changing the mark. */
+.pl-hero__dots button {
+  position: relative;
+}
+
+.pl-hero__dots button::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+}
+
+/* --------------------------------------------------------------------------
+   Breakpoints — reproduced from the prototype
+   -------------------------------------------------------------------------- */
+@media (max-width: 1200px) {
+  .pl-hero__copy { max-width: 470px; }
+
+  .pl-hero__prod {
+    width: min(44vw, 440px);
+    right: 3%;
+  }
+}
+
+@media (max-width: 900px) {
+  .pl-hero {
+    padding-top: var(--pl-hero-pad-top-mobile, 132px);
+  }
+
+  .pl-hero::before {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.62) 0%,
+      rgba(255, 255, 255, 0.34) 36%,
+      rgba(255, 255, 255, 0.66) 100%
+    );
+  }
+
+  .pl-hero__copy { max-width: none; }
+
+  .pl-hero__badges { display: none; }
+
+  .pl-hero__prod {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    width: min(88vw, 420px);
+    margin: 20px auto 0;
+  }
+
+  .pl-hero__stage { height: clamp(300px, 44svh, 430px); }
+
+  .pl-hero__tag {
+    padding: 9px 12px 10px;
+    border-radius: 14px;
+    max-width: 58%;
+  }
+
+  .pl-hero__tag .pl-price__now { font-size: 20px; }
+}
+
+@media (min-width: 901px) {
+  .pl-hero__strip { display: none; }
+}
+
+@media (max-width: 760px) {
+  .pl-hero { padding-top: var(--pl-hero-pad-top-mobile, 118px); }
+  .pl-hero .pl-d1 { font-size: clamp(44px, 13.5vw, 64px); }
+}
+
+@media (max-width: 420px) {
+  .pl-hero__prod { width: min(92vw, 360px); }
+
+  .pl-hero__strip > div {
+    font-size: 8px;
+    padding: 9px 4px;
+  }
+
+  .pl-hero__strip svg {
+    width: 16px;
+    height: 16px;
+  }
+}

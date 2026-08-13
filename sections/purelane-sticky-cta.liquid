@@ -1,0 +1,75 @@
+{%- comment -%}
+  PURELANE — STICKY CTA
+  The fixed offer bar at the bottom of narrow screens.
+
+  The prototype made room for it with `body { padding-bottom: 74px }`. A
+  section cannot restyle the theme's body, so a spacer element reserves the
+  same room without reaching outside itself.
+{%- endcomment -%}
+
+{{ 'purelane-tokens.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-base.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-chrome.css' | asset_url | stylesheet_tag }}
+
+{%- if section.settings.title != blank or section.settings.cta_label != blank -%}
+  <div class="pl pl-sticky-spacer" aria-hidden="true"></div>
+
+  <div class="pl pl-sticky">
+    <span class="pl-sticky__label">
+      {%- if section.settings.title != blank -%}
+        <b>{{ section.settings.title }}</b>
+      {%- endif -%}
+      {%- if section.settings.subtitle != blank -%}
+        <span>{{ section.settings.subtitle }}</span>
+      {%- endif -%}
+    </span>
+
+    {%- if section.settings.cta_label != blank -%}
+      <a class="pl-btn pl-btn--primary pl-btn--sm" href="{{ section.settings.cta_link | default: '#' }}">
+        {{ section.settings.cta_label }}
+      </a>
+    {%- endif -%}
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Purelane sticky CTA",
+  "tag": "div",
+  "class": "purelane-sticky-host",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Fixed to the bottom of the screen below 960px."
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Pick any 3, pay ₹499"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Free shipping, always"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button label",
+      "default": "Build bundle"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "Button link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Purelane sticky CTA"
+    }
+  ]
+}
+{% endschema %}

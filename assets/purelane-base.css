@@ -1,0 +1,440 @@
+/* ==========================================================================
+   PURELANE — SHARED BASE
+   --------------------------------------------------------------------------
+   Primitives every Purelane section reuses: type scale, glass surfaces,
+   buttons, the reveal animation, section shell and panel headings.
+
+   SCOPING
+   The prototype was a standalone page, so it styled bare element selectors
+   (`body`, `a`, `button`, `img`) and applied a global `* { margin: 0 }` reset.
+   Dropping that into Dawn would restyle the entire storefront — header, cart
+   drawer, product pages, everything.
+
+   So the reset and the element defaults are scoped to `.pl`, the wrapper every
+   Purelane section renders. Component classes are prefixed `pl-`. Nothing in
+   this file can reach outside a Purelane section. See BUILD-NOTES.md.
+
+   Visual values are unchanged from the prototype; only the selectors moved.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Scoped reset + inherited defaults (was: `*`, `body`, `a`, `button`, `img`)
+   -------------------------------------------------------------------------- */
+.pl,
+.pl *,
+.pl *::before,
+.pl *::after {
+  box-sizing: border-box;
+}
+
+.pl {
+  font-family: var(--pl-font-body);
+  color: var(--pl-paper);
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+  z-index: 2;
+}
+
+.pl h1,
+.pl h2,
+.pl h3,
+.pl h4,
+.pl h5,
+.pl p,
+.pl ul,
+.pl figure {
+  margin: 0;
+  padding: 0;
+}
+
+.pl ul {
+  list-style: none;
+}
+
+.pl img,
+.pl svg {
+  display: block;
+  max-width: 100%;
+}
+
+.pl a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.pl button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+/* Focus ring. Kept at 2px solid leaf green per the prototype's V2 override,
+   and applied to :focus-visible only so pointer users never see it. */
+.pl :focus-visible {
+  outline: 2px solid var(--pl-leaf);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* --------------------------------------------------------------------------
+   Type scale
+   -------------------------------------------------------------------------- */
+.pl-d1,
+.pl-d2,
+.pl-d3,
+.pl-d4 {
+  font-family: var(--pl-font-display);
+  text-transform: uppercase;
+  letter-spacing: -0.018em;
+  font-weight: 800;
+  line-height: 0.87;
+  color: var(--pl-surface);
+}
+
+.pl-d1 { font-size: clamp(48px, 8.6vw, 112px); }
+.pl-d2 { font-size: clamp(30px, 4.6vw, 54px); line-height: 0.94; }
+.pl-d3 { font-size: clamp(21px, 2.5vw, 30px); line-height: 1.04; font-weight: 700; letter-spacing: -0.01em; }
+.pl-d4 { font-size: clamp(16px, 1.6vw, 19px); line-height: 1.14; font-weight: 700; letter-spacing: 0.005em; }
+
+/* Prototype called this `.lime`; the colour it applies is the amber accent,
+   not lime. Renamed to describe the role rather than a colour it never had. */
+.pl-accent-text { color: var(--pl-accent); }
+
+.pl-lede {
+  font-size: clamp(15px, 1.35vw, 17.5px);
+  color: var(--pl-paper-2);
+  max-width: 44ch;
+}
+
+.pl-body-s {
+  font-size: 14.5px;
+  color: var(--pl-paper-2);
+  line-height: 1.66;
+}
+
+.pl-kicker {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--pl-paper-3);
+}
+
+/* --------------------------------------------------------------------------
+   Layout shell
+   -------------------------------------------------------------------------- */
+.pl-wrap {
+  max-width: var(--pl-maxw);
+  margin: 0 auto;
+  padding: 0 var(--pl-gutter);
+}
+
+.pl-sec {
+  position: relative;
+  padding: var(--pl-sec-y) 0;
+}
+
+.pl-sec-pad { padding: clamp(26px, 3.4vw, 40px); }
+
+@media (max-width: 760px) {
+  .pl-sec-pad { padding: 22px 18px; }
+}
+
+/* --------------------------------------------------------------------------
+   Glass surfaces
+   -------------------------------------------------------------------------- */
+.pl-glass {
+  background: var(--pl-g-bg);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  border: 1px solid var(--pl-g-line);
+  border-radius: var(--pl-r);
+  box-shadow: var(--pl-g-shadow), var(--pl-g-inset);
+  position: relative;
+  overflow: hidden;
+}
+
+.pl-glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.55), transparent 32%, transparent 74%, rgba(201, 118, 29, 0.06));
+}
+
+.pl-glass-2 {
+  background: var(--pl-g-bg-2);
+  backdrop-filter: blur(18px) saturate(135%);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  border: 1px solid var(--pl-g-line-2);
+  border-radius: var(--pl-r);
+  box-shadow: var(--pl-g-shadow-2), var(--pl-g-inset-2);
+  position: relative;
+  overflow: hidden;
+}
+
+@media (max-width: 760px) {
+  .pl-glass {
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+  }
+
+  .pl-glass-2 {
+    backdrop-filter: blur(12px) saturate(130%);
+    -webkit-backdrop-filter: blur(12px) saturate(130%);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Buttons
+   -------------------------------------------------------------------------- */
+.pl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 46px;
+  padding: 0 22px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  transition: 0.35s var(--pl-ease);
+  white-space: nowrap;
+}
+
+.pl-btn svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+}
+
+.pl-btn--primary {
+  background: linear-gradient(135deg, var(--pl-teal), var(--pl-teal-dk));
+  color: var(--pl-on-teal);
+  box-shadow: 0 12px 26px rgba(0, 80, 74, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.pl-btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 36px rgba(0, 80, 74, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+.pl-btn--ghost {
+  background: var(--pl-fill);
+  border: 1px solid var(--pl-line-strong);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--pl-teal-ink);
+}
+
+.pl-btn--ghost:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px);
+}
+
+.pl-btn--sm {
+  height: 38px;
+  padding: 0 18px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+}
+
+.pl-btn--block {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Disabled state. The prototype had no sold-out treatment because it had no
+   real inventory; this is required by the seeded sold-out product. */
+.pl-btn[disabled],
+.pl-btn[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* --------------------------------------------------------------------------
+   Visually hidden
+   Used to give screen readers the labels the prototype's decorative glyphs
+   (★★★★★, a bare <s> price) could not carry on their own.
+   -------------------------------------------------------------------------- */
+.pl-visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Price
+   Shared skeleton only. Each section sets its own type sizes, matching the
+   three different treatments the prototype used (card, combo, tier).
+   -------------------------------------------------------------------------- */
+.pl-price {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pl-price__now {
+  font-family: var(--pl-font-display);
+  font-weight: 700;
+  color: var(--pl-surface);
+}
+
+.pl-price__was { color: var(--pl-paper-3); }
+
+.pl-price__save {
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--pl-leaf);
+}
+
+/* --------------------------------------------------------------------------
+   Rating
+   -------------------------------------------------------------------------- */
+.pl-rate {
+  font-size: 11.5px;
+  color: var(--pl-paper-2);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pl-rate b {
+  color: var(--pl-accent);
+  font-weight: 700;
+}
+
+.pl-stars {
+  color: var(--pl-leaf-lt);
+  letter-spacing: 0.2em;
+}
+
+/* --------------------------------------------------------------------------
+   Product shot
+   Height-driven, exactly like the prototype's `.pimg`: each section sets a
+   height and the width follows from the image's own aspect ratio. Applies to
+   both the real <img> and the silhouette fallback so the two are
+   interchangeable in every layout.
+   -------------------------------------------------------------------------- */
+.pl-pimg {
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  flex: 0 0 auto;
+}
+
+/* --------------------------------------------------------------------------
+   Panel heading + rule
+   -------------------------------------------------------------------------- */
+.pl-panel-head {
+  text-align: center;
+  margin-bottom: 26px;
+}
+
+.pl-panel-head .pl-d2 { margin-bottom: 12px; }
+
+/* The prototype re-declared these two offsets inline on every use
+   (style="margin-top:12px", style="margin:14px auto 0"). The gap above the
+   heading only appeared when a kicker preceded it — "Sourced from nature" has
+   no kicker and no offset — so that relationship is expressed as a sibling
+   selector rather than baked in unconditionally. */
+.pl-panel-head .pl-kicker + .pl-panel-head__title { margin-top: 12px; }
+
+.pl-panel-head__lede { margin: 14px auto 0; }
+
+.pl-rule {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin: 0 0 20px;
+  max-width: 270px;
+}
+
+.pl-rule i {
+  height: 1px;
+  flex: 1;
+  background: linear-gradient(90deg, rgba(75, 58, 143, 0.34), transparent);
+}
+
+.pl-rule svg {
+  width: 16px;
+  height: 16px;
+  color: var(--pl-accent);
+  flex: 0 0 auto;
+}
+
+.pl-panel-head .pl-rule {
+  margin: 0 auto;
+  justify-content: center;
+  max-width: 240px;
+}
+
+.pl-panel-head .pl-rule i:first-child {
+  background: linear-gradient(90deg, transparent, rgba(75, 58, 143, 0.34));
+}
+
+/* --------------------------------------------------------------------------
+   Reveal on scroll
+   Elements start hidden and are revealed by purelane-reveal.js. If JS never
+   runs, the `.pl-rv` rule below is inert until the script adds `is-observed`,
+   so content is visible by default and can never be trapped at opacity 0.
+   -------------------------------------------------------------------------- */
+.pl-rv.is-observed {
+  opacity: 0;
+  transform: translateY(30px);
+  filter: blur(7px);
+  transition:
+    opacity 0.95s var(--pl-ease),
+    transform 0.95s var(--pl-ease),
+    filter 0.95s var(--pl-ease);
+}
+
+.pl-rv.is-observed.is-in {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+.pl-rv--d1 { transition-delay: 0.09s; }
+.pl-rv--d2 { transition-delay: 0.18s; }
+.pl-rv--d3 { transition-delay: 0.27s; }
+.pl-rv--d4 { transition-delay: 0.36s; }
+.pl-rv--d5 { transition-delay: 0.45s; }
+
+/* --------------------------------------------------------------------------
+   Reduced motion
+   Scoped to .pl so it cannot override Dawn's own motion handling.
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .pl *,
+  .pl *::before,
+  .pl *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .pl-rv.is-observed,
+  .pl-rv.is-observed.is-in {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}

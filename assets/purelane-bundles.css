@@ -1,0 +1,156 @@
+/* ==========================================================================
+   PURELANE — BUNDLES
+   The "One box. Every room." intro panel and the three build-your-box tiers.
+   ========================================================================== */
+
+.pl-bundles__intro { margin-bottom: 16px; }
+
+/* The intro panel's heading block is left un-margined at the bottom because
+   the panel itself supplies the spacing. */
+.pl-bundles__intro .pl-panel-head { margin-bottom: 0; }
+
+.pl-tiers {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 760px) {
+  .pl-tiers { grid-template-columns: repeat(var(--pl-tier-columns, 3), 1fr); }
+}
+
+.pl-tier {
+  padding: 24px 22px;
+  transition: 0.4s var(--pl-ease);
+  display: flex;
+  flex-direction: column;
+}
+
+.pl-tier:hover { transform: translateY(-5px); }
+
+.pl-tier--featured {
+  border-color: rgba(201, 118, 29, 0.46);
+  box-shadow:
+    0 22px 54px rgba(58, 44, 112, 0.14),
+    0 0 0 1px rgba(201, 118, 29, 0.24),
+    var(--pl-g-inset);
+}
+
+.pl-tier__tag {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 5px 11px;
+  border-radius: 999px;
+  margin-bottom: 14px;
+  background: var(--pl-accent-fill);
+  border: 1px solid var(--pl-accent-line);
+  color: var(--pl-leaf);
+}
+
+/* --- Product row --------------------------------------------------------- */
+.pl-tier__pix {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+  height: 78px;
+  margin: -4px 0 16px;
+  padding: 8px 6px;
+  border-radius: 14px;
+  background: linear-gradient(162deg, rgba(255, 255, 255, 0.54), rgba(236, 230, 247, 0.34));
+  border: 1px solid var(--pl-line-soft);
+}
+
+.pl-tier__pix .pl-pimg {
+  height: 62px;
+  filter: var(--pl-shadow-prod-sm);
+}
+
+/* Five shots need to be shorter to stay inside the same tray height. Driven by
+   a count attribute rather than a hand-applied class, so it adapts to whatever
+   the merchant picks. */
+.pl-tier__pix[data-count="4"] .pl-pimg,
+.pl-tier__pix[data-count="5"] .pl-pimg {
+  height: 54px;
+}
+
+/* --- Quantity ------------------------------------------------------------ */
+.pl-tier__qty {
+  font-family: var(--pl-font-display);
+  font-weight: 800;
+  font-size: 52px;
+  line-height: 0.9;
+  color: var(--pl-surface);
+  letter-spacing: -0.03em;
+}
+
+.pl-tier__qty small {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pl-paper-3);
+  display: block;
+  margin-top: 6px;
+}
+
+/* --- Price --------------------------------------------------------------- */
+.pl-tier__price {
+  margin: 16px 0 4px;
+  gap: 8px;
+}
+
+.pl-tier__price .pl-price__now {
+  font-weight: 700;
+  font-size: 27px;
+  color: var(--pl-accent);
+}
+
+.pl-tier__price .pl-price__was {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.pl-tier__unit { font-size: 12px; }
+
+/* --- Features ------------------------------------------------------------ */
+.pl-tier__list {
+  margin: 16px 0 20px;
+  display: grid;
+  gap: 8px;
+}
+
+.pl-tier__list li {
+  display: flex;
+  gap: 9px;
+  font-size: 13px;
+  color: var(--pl-paper-2);
+}
+
+.pl-tier__list svg {
+  width: 14px;
+  height: 14px;
+  color: var(--pl-leaf);
+  flex: 0 0 auto;
+  margin-top: 4px;
+}
+
+/* Pins the button to the bottom so tiers with different feature counts still
+   line their buttons up. The prototype's tiers happened to be even, so it
+   never needed this; merchant-entered lists will not be. */
+.pl-tier .pl-btn { margin-top: auto; }
+
+@media (max-width: 760px) {
+  .pl-tier__qty { font-size: 44px; }
+  .pl-tier__pix { height: 70px; }
+  .pl-tier__pix .pl-pimg { height: 54px; }
+
+  .pl-tier__pix[data-count="4"] .pl-pimg,
+  .pl-tier__pix[data-count="5"] .pl-pimg {
+    height: 46px;
+  }
+}

@@ -1,0 +1,84 @@
+{%- comment -%}
+  PURELANE — BACKDROP
+  ---------------------------------------------------------------------------
+  The fixed scene behind the page. Add this once, at the top of the template.
+
+  In the prototype this markup sat outside <main> and every section carried a
+  `data-scene` number telling it which gradient to show. That relationship
+  survives: each Purelane section exposes `data-pl-scene`, and this section
+  watches for them. Because it discovers them at runtime rather than being
+  handed a list, adding, removing or reordering sections in the theme editor
+  keeps working with no configuration here.
+
+  The water layers are ~22 KB of inline SVG paths. That is a real cost, so it
+  is a setting — but it defaults on, because it is the design.
+{%- endcomment -%}
+
+{{ 'purelane-backdrop.css' | asset_url | stylesheet_tag }}
+
+<script src="{{ 'purelane-backdrop.js' | asset_url }}" defer></script>
+
+{%- comment -%}
+  aria-hidden: the whole thing is decoration. It also sits at z-index 0 with
+  pointer-events disabled so it can never intercept a click.
+{%- endcomment -%}
+<div
+  class="pl-backdrop"
+  data-pl-backdrop
+  data-depth="1"
+  data-parallax="{{ section.settings.parallax }}"
+  aria-hidden="true"
+>
+  {%- for i in (1..4) -%}
+    <div class="pl-scene pl-scene--{{ i }}{% if forloop.first %} is-on{% endif %}"></div>
+  {%- endfor -%}
+
+  {%- if section.settings.show_water -%}
+    <div class="pl-water">
+      {% render 'purelane-water', uid: section.id %}
+    </div>
+  {%- endif -%}
+
+  {%- if section.settings.show_vignette -%}
+    <div class="pl-vignette"></div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Purelane backdrop",
+  "tag": "div",
+  "class": "purelane-backdrop-host",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Add this once, as the first section on the page. It renders the fixed gradient, water and vignette behind everything else."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_water",
+      "label": "Show water layers",
+      "info": "Adds roughly 22 KB of inline SVG. Turning it off keeps the gradient and vignette.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vignette",
+      "label": "Show vignette",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "parallax",
+      "label": "Parallax on scroll and pointer",
+      "info": "Always disabled for visitors who prefer reduced motion, and on touch devices.",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Purelane backdrop"
+    }
+  ]
+}
+{% endschema %}

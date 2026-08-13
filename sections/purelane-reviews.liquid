@@ -1,0 +1,303 @@
+{%- comment -%}
+  PURELANE — REVIEWS RAIL
+  ---------------------------------------------------------------------------
+  The auto-scrolling marquee of customer reviews below the hero.
+
+  The prototype's track held ten cards, but only five reviews: the set was
+  duplicated in the source so the loop could translate -50% and appear
+  seamless. That duplication is a rendering detail, not content, so a merchant
+  edits five review blocks here and the clone set is generated — and marked
+  aria-hidden, because the prototype announced every review twice.
+
+  Reduced motion is handled properly rather than by stopping the animation
+  alone: see purelane-reviews.css.
+{%- endcomment -%}
+
+{{ 'purelane-tokens.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-base.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-reviews.css' | asset_url | stylesheet_tag }}
+
+<script src="{{ 'purelane-reveal.js' | asset_url }}" defer></script>
+
+{%- liquid
+  assign reviews = section.blocks
+  assign duration = section.settings.speed | append: 's'
+-%}
+
+<div class="pl pl-reviews" {% if section.settings.anchor != blank %}id="{{ section.settings.anchor | handle }}"{% endif %} data-pl-scene="{{ section.settings.scene }}">
+
+  {%- if section.settings.kicker != blank
+    or section.settings.rating_summary != blank
+    or section.settings.reach_summary != blank
+  -%}
+    <div class="pl-wrap">
+      <div class="pl-reviews__head pl-rv">
+        {%- if section.settings.kicker != blank -%}
+          <span class="pl-kicker">{{ section.settings.kicker }}</span>
+        {%- endif -%}
+
+        {%- if section.settings.rating_summary != blank -%}
+          <span class="pl-reviews__agg">
+            {%- if section.settings.show_summary_stars -%}
+              {% render 'purelane-rating',
+                rating: section.settings.average_rating,
+                style: 'stars'
+              %}
+            {%- endif -%}
+            {{ section.settings.rating_summary }}
+          </span>
+        {%- endif -%}
+
+        {%- if section.settings.reach_summary != blank -%}
+          <span class="pl-reviews__agg">{{ section.settings.reach_summary }}</span>
+        {%- endif -%}
+      </div>
+    </div>
+  {%- endif -%}
+
+  {%- if reviews.size > 0 -%}
+    <div
+      class="pl-reviews__rail pl-rv"
+      tabindex="0"
+      role="group"
+      aria-label="{{ section.settings.rail_label | default: 'Customer reviews' | escape }}"
+    >
+      <div class="pl-reviews__track" style="--pl-marquee-duration: {{ duration }};">
+
+        {%- comment -%}
+          Pass 1: the real reviews.
+          Pass 2: the seamless-loop clone, hidden from assistive tech.
+        {%- endcomment -%}
+        {%- for pass in (1..2) -%}
+          {%- assign is_clone = false -%}
+          {%- if pass == 2 -%}
+            {%- assign is_clone = true -%}
+          {%- endif -%}
+
+          {%- for block in reviews -%}
+            <article
+              class="pl-glass-2 pl-review"
+              {% if is_clone %}
+                aria-hidden="true"
+                data-pl-marquee-clone
+              {% else %}
+                {{ block.shopify_attributes }}
+              {% endif %}
+            >
+              {%- if block.settings.rating > 0 -%}
+                {% render 'purelane-rating',
+                  rating: block.settings.rating,
+                  style: 'stars'
+                %}
+              {%- endif -%}
+
+              {%- if block.settings.title != blank -%}
+                <h3 class="pl-review__title">{{ block.settings.title }}</h3>
+              {%- endif -%}
+
+              {%- if block.settings.body != blank -%}
+                <p class="pl-review__body">{{ block.settings.body }}</p>
+              {%- endif -%}
+
+              {%- if block.settings.author != blank or block.settings.product != blank -%}
+                <div class="pl-review__who">
+                  {%- if block.settings.verified -%}
+                    {% render 'purelane-icon', name: 'check-round' %}
+                    <span class="pl-visually-hidden">Verified buyer: </span>
+                  {%- endif -%}
+
+                  {%- if block.settings.author != blank -%}
+                    <b>{{ block.settings.author }}</b>
+                  {%- endif -%}
+
+                  {%- comment -%}
+                    The product a review is about is a real product reference,
+                    so the name follows a rename instead of going stale.
+                  {%- endcomment -%}
+                  {%- if block.settings.product != blank -%}
+                    <span>
+                      <span aria-hidden="true">·</span>
+                      {{ block.settings.product.title }}
+                    </span>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+            </article>
+          {%- endfor -%}
+        {%- endfor -%}
+
+      </div>
+    </div>
+  {%- endif -%}
+
+</div>
+
+{% schema %}
+{
+  "name": "Purelane reviews rail",
+  "tag": "section",
+  "class": "purelane-section purelane-section--reviews",
+  "settings": [
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Anchor id",
+      "info": "Lets links and the progress rail jump here, e.g. shop. Omit the #.",
+      "default": "reviews"
+    },
+    {
+      "type": "header",
+      "content": "Summary"
+    },
+    {
+      "type": "text",
+      "id": "kicker",
+      "label": "Eyebrow",
+      "default": "That's what they said"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_summary_stars",
+      "label": "Show stars beside the summary",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "average_rating",
+      "label": "Average rating",
+      "min": 1,
+      "max": 5,
+      "step": 0.1,
+      "default": 4.8
+    },
+    {
+      "type": "text",
+      "id": "rating_summary",
+      "label": "Rating summary",
+      "default": "4.8 from 8,000+ reviews"
+    },
+    {
+      "type": "text",
+      "id": "reach_summary",
+      "label": "Reach summary",
+      "default": "Loved by 12 lakh+ homes"
+    },
+    {
+      "type": "header",
+      "content": "Rail"
+    },
+    {
+      "type": "text",
+      "id": "rail_label",
+      "label": "Rail accessible label",
+      "default": "Customer reviews"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "Seconds per loop",
+      "info": "Higher is slower. Ignored for visitors who prefer reduced motion.",
+      "min": 20,
+      "max": 120,
+      "step": 2,
+      "default": 52
+    },
+    {
+      "type": "range",
+      "id": "scene",
+      "label": "Backdrop depth",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 1
+    }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Review",
+      "settings": [
+        {
+          "type": "range",
+          "id": "rating",
+          "label": "Rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Headline",
+          "default": "Works like a charm"
+        },
+        {
+          "type": "textarea",
+          "id": "body",
+          "label": "Review",
+          "default": "Finally an eco option that cleans as well as the chemical detergent I used for years, and it smells better."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Name",
+          "default": "Anita"
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product reviewed",
+          "info": "The product name is read from Shopify, so it follows a rename."
+        },
+        {
+          "type": "checkbox",
+          "id": "verified",
+          "label": "Verified buyer",
+          "default": true
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Purelane reviews rail",
+      "blocks": [
+        { "type": "review" },
+        {
+          "type": "review",
+          "settings": {
+            "title": "Best dishwash ever",
+            "body": "Our old dishwash left my help with dry, cracked skin. That stopped completely after we switched.",
+            "author": "Priya"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "title": "Great product, great packaging",
+            "body": "Very soft on hands with a lovely fragrance, and it feels good to be using far less plastic.",
+            "author": "Sunita"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "title": "Dog friendly",
+            "body": "We switched because chemical floor cleaners were setting off my dog's allergies. No reactions since.",
+            "author": "Rohit S."
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "title": "Sparkling taps again",
+            "body": "Hard water had ruined our bathroom fittings. Two sprays and the scale wipes straight off, no scrubbing.",
+            "author": "Verified buyer"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

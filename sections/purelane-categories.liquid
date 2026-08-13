@@ -1,0 +1,213 @@
+{%- comment -%}
+  PURELANE — BUNDLE CATEGORIES
+  "Find the right bundle for you" — four cards, each a route into a bundle
+  category.
+
+  Each card points at a real collection, so its link and its artwork come from
+  the catalogue. A merchant can still override the title, description and
+  image where the collection's own wording is not the marketing wording.
+{%- endcomment -%}
+
+{{ 'purelane-tokens.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-base.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-silhouettes.css' | asset_url | stylesheet_tag }}
+{{ 'purelane-showcase.css' | asset_url | stylesheet_tag }}
+
+<script src="{{ 'purelane-reveal.js' | asset_url }}" defer></script>
+
+<div class="pl pl-sec" {% if section.settings.anchor != blank %}id="{{ section.settings.anchor | handle }}"{% endif %} data-pl-scene="{{ section.settings.scene }}">
+  <div class="pl-wrap">
+
+    {% render 'purelane-section-head',
+      kicker: section.settings.kicker,
+      heading: section.settings.heading,
+      heading_level: section.settings.heading_level,
+      show_rule: section.settings.show_rule
+    %}
+
+    {%- if section.blocks.size > 0 -%}
+      <div class="pl-categories" style="--pl-categories-columns: {{ section.settings.columns }};">
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign collection = block.settings.collection
+            assign title = block.settings.title | default: collection.title
+            assign link = block.settings.link | default: collection.url
+
+            comment
+              Artwork: an explicit product wins, then the collection's featured
+              image, then its first product. Falling through like this means a
+              merchant who only picks a collection still gets a card that looks
+              finished.
+            endcomment
+            assign art_product = block.settings.product | default: collection.products.first
+
+            assign delay = ''
+            if forloop.index0 > 0
+              assign delay = 'pl-rv--d' | append: forloop.index0
+            endif
+          -%}
+
+          <a
+            class="pl-glass pl-category pl-rv {{ delay }}"
+            href="{{ link | default: '#' }}"
+            {{ block.shopify_attributes }}
+          >
+            <span class="pl-category__photo">
+              {%- if block.settings.image != blank -%}
+                {{
+                  block.settings.image
+                  | image_url: width: 400
+                  | image_tag:
+                    loading: 'lazy',
+                    widths: '160,220,300,400',
+                    sizes: '(min-width: 900px) 260px, 44vw',
+                    alt: title,
+                    class: 'pl-pimg'
+                }}
+              {%- elsif collection.featured_image != blank -%}
+                {% render 'purelane-product-media',
+                  image: collection.featured_image,
+                  product: art_product,
+                  sizes: '(min-width: 900px) 260px, 44vw',
+                  alt: title
+                %}
+              {%- else -%}
+                {% render 'purelane-product-media',
+                  product: art_product,
+                  sizes: '(min-width: 900px) 260px, 44vw',
+                  alt: title
+                %}
+              {%- endif -%}
+            </span>
+
+            <span class="pl-category__text">
+              {%- if title != blank -%}
+                <span class="pl-category__title">{{ title }}</span>
+              {%- endif -%}
+              {%- if block.settings.text != blank -%}
+                <p>{{ block.settings.text }}</p>
+              {%- endif -%}
+            </span>
+          </a>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Purelane categories",
+  "tag": "section",
+  "class": "purelane-section purelane-section--categories",
+  "settings": [
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Anchor id",
+      "info": "Lets links and the progress rail jump here, e.g. shop. Omit the #.",
+      "default": "categories"
+    },
+    {
+      "type": "text",
+      "id": "kicker",
+      "label": "Eyebrow",
+      "default": "Bundle categories"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Find the right bundle for you"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rule",
+      "label": "Show leaf divider",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "heading_level",
+      "label": "Heading level",
+      "options": [
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Columns on desktop",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "scene",
+      "label": "Backdrop depth",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 4
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection",
+          "info": "Supplies the link, title and artwork unless overridden below."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title override"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Description",
+          "default": "Grease, dishes & more"
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Artwork product",
+          "info": "Optional. Overrides which product is shown on the card."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Artwork image",
+          "info": "Optional. Overrides everything above."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link override"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Purelane categories",
+      "blocks": [
+        { "type": "category", "settings": { "title": "Kitchen bundle", "text": "Grease, dishes & more" } },
+        { "type": "category", "settings": { "title": "Bathroom bundle", "text": "Deep clean & disinfect" } },
+        { "type": "category", "settings": { "title": "Laundry bundle", "text": "Softer, fresher wash" } },
+        { "type": "category", "settings": { "title": "Hard water bundle", "text": "Melt away limescale" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

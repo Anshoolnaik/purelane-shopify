@@ -1,0 +1,141 @@
+/* ==========================================================================
+   PURELANE — ICON GRIDS
+   Three related components that all pair an icon with a short label:
+     .pl-trust    the compact trust bar          (icon beside text)
+     .pl-reasons  "why bundles beat buying single" (icon above centred text)
+     .pl-pillars  the three larger benefit cards  (icon, heading, copy, link)
+
+   They share a stylesheet because they share a pattern. Keeping them in one
+   file means one request for any page that uses more than one of them.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Trust bar
+   -------------------------------------------------------------------------- */
+.pl-trust {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px;
+  padding: 6px;
+}
+
+@media (min-width: 820px) {
+  .pl-trust { grid-template-columns: repeat(var(--pl-trust-columns, 4), 1fr); }
+}
+
+.pl-trust__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 14px;
+}
+
+.pl-trust__item svg {
+  width: 26px;
+  height: 26px;
+  color: var(--pl-leaf);
+  flex: 0 0 auto;
+}
+
+.pl-trust__item span {
+  font-family: var(--pl-font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--pl-paper-2);
+  line-height: 1.32;
+}
+
+/* --------------------------------------------------------------------------
+   Reasons grid
+   -------------------------------------------------------------------------- */
+.pl-reasons {
+  display: grid;
+  gap: 20px 16px;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (min-width: 880px) {
+  .pl-reasons { grid-template-columns: repeat(var(--pl-reasons-columns, 4), 1fr); }
+}
+
+.pl-reasons__item { text-align: center; }
+
+.pl-reasons__icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 36% 28%, rgba(201, 118, 29, 0.2), rgba(75, 58, 143, 0.12));
+  border: 1px solid var(--pl-g-line);
+  color: var(--pl-leaf);
+}
+
+.pl-reasons__icon svg {
+  width: 25px;
+  height: 25px;
+}
+
+.pl-reasons__title {
+  font-family: var(--pl-font-display);
+  font-size: 13.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--pl-surface);
+  margin-bottom: 7px;
+}
+
+.pl-reasons__item p {
+  font-size: 12.2px;
+  color: var(--pl-paper-2);
+  line-height: 1.5;
+}
+
+/* --------------------------------------------------------------------------
+   Pillars
+   -------------------------------------------------------------------------- */
+.pl-pillars {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 820px) {
+  .pl-pillars { grid-template-columns: repeat(var(--pl-pillars-columns, 3), 1fr); }
+}
+
+.pl-pillar {
+  padding: 26px 24px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.pl-pillar__icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 15px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 16px;
+  background: linear-gradient(150deg, rgba(201, 118, 29, 0.18), rgba(75, 58, 143, 0.12));
+  border: 1px solid var(--pl-g-line);
+  color: var(--pl-leaf);
+}
+
+.pl-pillar__icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.pl-pillar .pl-d3 { margin-bottom: 11px; }
+
+.pl-pillar p {
+  margin-bottom: 20px;
+  flex: 1;
+}
+
+.pl-pillar .pl-btn { align-self: flex-start; }

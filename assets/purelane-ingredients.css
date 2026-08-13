@@ -1,0 +1,66 @@
+/* ==========================================================================
+   PURELANE — INGREDIENTS
+   Five botanical drawings with a name and a one-line note, divided by
+   hairlines on wide screens.
+   ========================================================================== */
+
+.pl-ingredients {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0;
+}
+
+@media (min-width: 760px) {
+  .pl-ingredients { grid-template-columns: repeat(var(--pl-ingredients-columns, 5), 1fr); }
+}
+
+.pl-ingredient {
+  text-align: center;
+  padding: 16px 12px;
+  position: relative;
+}
+
+/* Hairline between items. Only from 760px, where the row is a single line —
+   below that the grid wraps and a left-edge rule would land mid-row. */
+@media (min-width: 760px) {
+  .pl-ingredient + .pl-ingredient::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 14%;
+    bottom: 14%;
+    width: 1px;
+    background: linear-gradient(180deg, transparent, rgba(75, 58, 143, 0.2), transparent);
+  }
+}
+
+.pl-ingredient__art {
+  height: 88px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 12px;
+  color: var(--pl-botanical);
+}
+
+.pl-ingredient__art svg {
+  height: 84px;
+  width: auto;
+}
+
+.pl-botanical__accent { stroke: var(--pl-accent); }
+
+.pl-ingredient__name {
+  font-family: var(--pl-font-display);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--pl-surface);
+  margin-bottom: 6px;
+}
+
+.pl-ingredient p {
+  font-size: 12.2px;
+  color: var(--pl-paper-2);
+  line-height: 1.5;
+}

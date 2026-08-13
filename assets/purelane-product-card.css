@@ -1,0 +1,98 @@
+/* ==========================================================================
+   PURELANE — PRODUCT CARD
+   Geometry reproduced from the prototype's `.card`. Additions are limited to
+   states the prototype had no data for: sold out, a missing rating, and a
+   title long enough to break the row.
+   ========================================================================== */
+
+.pl-card {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  transition: 0.4s var(--pl-ease);
+}
+
+.pl-card:hover { transform: translateY(-5px); }
+
+/* --- Shot ---------------------------------------------------------------- */
+.pl-card__shot {
+  height: 150px;
+  border-radius: 14px;
+  margin-bottom: 14px;
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.6), rgba(236, 230, 247, 0.42));
+  border: 1px solid var(--pl-line-soft);
+}
+
+.pl-card__img {
+  height: 122px;
+  filter: drop-shadow(0 8px 13px rgba(0, 74, 66, 0.13));
+}
+
+.pl-card__badge {
+  position: absolute;
+  top: 9px;
+  left: 9px;
+  z-index: 2;
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: var(--pl-fill-strong);
+  border: 1px solid var(--pl-accent-line);
+  color: var(--pl-leaf);
+}
+
+/* Sold out reads as a state, not a promotion, so it drops the accent border. */
+.pl-card__badge--out {
+  border-color: var(--pl-line-strong);
+  color: var(--pl-paper-3);
+}
+
+/* --- Title --------------------------------------------------------------- */
+.pl-card__title {
+  font-family: var(--pl-font-display);
+  font-size: 13.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--pl-surface);
+  line-height: 1.2;
+  margin-bottom: 7px;
+
+  /* Clamped so one long product name cannot make its card taller than the
+     rest of the row. The seeded catalogue includes such a title. */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* --- Meta ---------------------------------------------------------------- */
+.pl-card__rate { margin-bottom: 10px; }
+
+/* `margin-top: auto` pins the price and button to the bottom so cards align
+   across a row regardless of title length or a missing rating. In the
+   prototype this sat on the price; it moves to whichever element comes first
+   so an unrated product still aligns. */
+.pl-card__price {
+  margin-top: auto;
+  margin-bottom: 12px;
+}
+
+.pl-card__price .pl-price__now { font-size: 18px; }
+.pl-card__price .pl-price__was { font-size: 12px; }
+.pl-card__price .pl-price__save { font-size: 10px; }
+
+.pl-card__form { margin: 0; }
+
+/* --- Mobile -------------------------------------------------------------- */
+@media (max-width: 760px) {
+  .pl-card__shot { height: 126px; }
+  .pl-card__img { height: 108px; }
+}
