@@ -357,9 +357,63 @@ which is a **Liquid keyword literal** used in comparisons like `value == empty`.
 Assigning to it shadows the language's own token. That reads as a style warning
 and is not one.
 
-**Not verified in a browser.** I did not have a development store to render
-against, so nothing here has been visually diffed against the prototype or run
-through Lighthouse. The pixel-accuracy claim rests on values being lifted
-directly from the source, not on a screenshot comparison. Section 6.6 is how I
-would close that, and it is the first thing to do after step 5 of
-[SETUP.md](SETUP.md).
+**Verified live.** The theme is deployed to a development store and renders all
+17 homepage sections with real products — 8 product cards, 19 prices, 18
+compare-at prices with derived savings, 3 sold-out states, 8 working add-to-cart
+forms, and no Liquid errors.
+
+Still not automated: there is no screenshot diff against the prototype. Visual
+comparison was done by eye. Section 6.6 remains the right next step.
+
+---
+
+## 8. Three bugs that only surfaced on deployment
+
+None of these are visible locally. All three pass `shopify theme check`. They
+are recorded here because the failure mode — Shopify **silently dropping a
+file** — cost more time than every other problem in this build combined.
+
+### 8.1 An unreachable range default
+
+```json
+{ "id": "autoplay_interval", "min": 2, "max": 10, "step": 0.5, "default": 3.8 }
+```
+
+From a minimum of 2 in steps of 0.5 you reach 2.0, 2.5, 3.0, 3.5, 4.0 — never
+3.8. Shopify rejects the schema, and rejecting the schema drops the whole
+section file.
+
+### 8.2 An empty-string default
+
+```json
+{ "type": "text", "id": "anchor", "default": "" }
+```
+
+*"setting with id=anchor default can't be blank."* A setting with no default is
+fine; the key has to be **absent**, not empty. Two sections carried this.
+
+### 8.3 The cascade that hid the hero
+
+`purelane-base.css` is emitted by every section, so it appears 18 times in the
+rendered page and its last copy lands after most section stylesheets. Any
+single-class component rule therefore loses to a single-class base rule.
+
+The hero badge rail carries `.pl-glass-2`, which sets `position: relative`. That
+beat `.pl-hero__badges { position: absolute }`, dropped the rail into normal
+flow, and pushed the headline and product stage off screen. The page looked
+broken in a way that had nothing to do with the hero markup.
+
+Fixed by scoping every component that carries a glass class and overrides one of
+its properties. The underlying tension is real and worth naming: per-section
+stylesheets keep sections self-contained, which is a goal, but they re-apply
+shared primitives at the end of the cascade.
+
+### Why they were expensive
+
+8.1 and 8.2 cascade. A rejected section makes `templates/index.json` invalid for
+referencing it, so the template is rejected too — leaving the homepage with no
+template and serving a 404. Three upload paths (ZIP import, GitHub sync, admin
+editor) each failed this way and **none reported an error**. Only
+`shopify theme push --only <single-file>` ever printed the reason.
+
+`scripts/check-schemas.py` now covers both schema rules across all 242 settings.

@@ -152,10 +152,31 @@ In descending order of value:
    message. When something looks wrong three sections later, `git log -p` on one
    file answers "why is this like this" without re-deriving it.
 
-What did **not** catch anything, and should have: no browser. Everything here is
-verified by reading and static parsing. That is the honest limit of this
-submission and it is stated plainly at the end of
-[BUILD-NOTES.md](BUILD-NOTES.md).
+What did **not** catch anything, and should have: **deployment**. Every check
+above runs against source. All three bugs that actually broke the site were
+invisible to source-level checking and only appeared on a real store:
+
+- a range `default` that isn't reachable from `min` in whole `step`s
+- a `"default": ""` where the key should simply be absent
+- a CSS cascade conflict that only exists once the *rendered page* stacks 18
+  copies of the shared stylesheet
+
+Two of those made Shopify **silently drop the file**. The uploader reported
+success and the file was not there. The dropped section then invalidated the
+JSON template that referenced it, so the homepage lost its template and served a
+404 — a symptom three steps removed from the cause, with no error anywhere.
+
+The lesson generalises past Shopify: **an agent optimises for the checks you can
+run, and the checks you can run are the ones that pass.** Theme Check was green
+the entire time. What was missing was a check for the rules the *platform*
+enforces but the *linter* doesn't, which is now `scripts/check-schemas.py`.
+
+The other half of the lesson is about tooling honesty. Three delivery
+mechanisms — ZIP import, GitHub sync, the admin code editor — all failed the
+same way and none said why. The only one that named the offending file was
+`shopify theme push --only <single-file>`. When a tool reports success and the
+result is wrong, stop using it and find one that reports failures; narrowing the
+input until the error surfaces beats reasoning about the output.
 
 ---
 
@@ -201,14 +222,21 @@ Written into the prompt, not hoped for:
 Without this the agent tidies as it goes, and "pixel-accurate" quietly stops
 being true.
 
-### 4. Screenshot diffing in CI
+### 4. A pre-deploy platform check
+
+, generalised. Theme Check validates Liquid and
+markup; it does not validate the rules Shopify enforces at upload time. Every
+one of those rules learned the hard way should land in a script that runs before
+a push, because the platform will not tell you which rule you broke.
+
+### 5. Screenshot diffing in CI
 
 The one missing layer. Playwright against the prototype at 375/768/1024/1440,
 per section, on every commit. That converts "I read it carefully" into something
 that holds up when someone else edits the theme. This is the first thing I would
 add with more time — see BUILD-NOTES §6.6.
 
-### 5. A metafield definition file, not a document
+### 6. A metafield definition file, not a document
 
 `docs/metafields.md` is prose a human has to follow by hand. The definitions
 should be a GraphQL mutation file run by a script, so the store setup is
