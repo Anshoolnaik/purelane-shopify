@@ -31,7 +31,15 @@
         <div class="pl-lede">{{ section.settings.text }}</div>
       {%- endif -%}
 
-      {%- form 'customer', class: 'pl-signup__form', id: 'purelane-signup-' | append: section.id -%}
+      {%- comment -%}
+        The id is built into a variable first. A filter expression passed
+        directly as a tag parameter — `id: 'x-' | append: section.id` — parses
+        locally but is not reliably accepted by Shopify's form tag, and a file
+        that fails to parse is rejected on upload without an error message.
+      {%- endcomment -%}
+      {%- assign signup_form_id = 'purelane-signup-' | append: section.id -%}
+
+      {%- form 'customer', class: 'pl-signup__form', id: signup_form_id -%}
         <input type="hidden" name="contact[tags]" value="newsletter">
 
         {%- comment -%}
